@@ -26,4 +26,9 @@ public class SupplierServiceImplArraylist implements SupplierService {
         return new ArrayList<>();
     }
 
+     @Override
+    public void emptyArrayList() {
+        supplierList = new ArrayList<>();
+    }
+
 }
