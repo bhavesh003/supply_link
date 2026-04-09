@@ -1,6 +1,9 @@
 package com.edutech.progressive.entity;
 
-public class Warehouse {
+import javax.persistence.Entity;
+
+@Entity
+public class Warehouse implements Comparable<Warehouse> {
     private int warehouseId;
     private int supplierId;
     private String warehouseName;
@@ -56,5 +59,10 @@ public class Warehouse {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    @Override
+    public int compareTo(Warehouse o) {
+        return Double.compare(o.getCapacity(), this.getCapacity());
     }
 }

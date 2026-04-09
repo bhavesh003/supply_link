@@ -1,6 +1,11 @@
 package com.edutech.progressive.entity;
 
-public class Supplier {
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+public class Supplier implements Comparable<Supplier> {
     private int supplierId;
     private String supplierName;
     private String email;
@@ -87,5 +92,10 @@ public class Supplier {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    @Override
+    public int compareTo(Supplier arg0) {
+        return this.getSupplierName().compareTo(arg0.getSupplierName());
     }
 }
