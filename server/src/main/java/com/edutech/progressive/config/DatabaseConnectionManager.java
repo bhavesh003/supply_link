@@ -14,7 +14,8 @@ public class DatabaseConnectionManager {
     }
 
     public static void loadProperties() {
-        try (InputStream input = DatabaseConnectionManager.class.getClassLoader().getResourceAsStream("application.properties")) {
+        try (InputStream input = DatabaseConnectionManager.class.getClassLoader()
+                .getResourceAsStream("application.properties")) {
             if (input == null) {
                 throw new RuntimeException("Unable to find application.properties");
             }

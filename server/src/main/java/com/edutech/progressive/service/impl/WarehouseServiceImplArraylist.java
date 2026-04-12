@@ -7,6 +7,7 @@ import java.util.*;
 import com.edutech.progressive.entity.Warehouse;
 import com.edutech.progressive.service.WarehouseService;
 
+
 public class WarehouseServiceImplArraylist implements WarehouseService {
 
     private static List<Warehouse> warehouseList = new ArrayList<>();

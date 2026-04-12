@@ -1,5 +1,7 @@
 package com.edutech.progressive.service.impl;
 
-public class ProductServiceImplJpa  {
+import com.edutech.progressive.service.ProductService;
+
+public class ProductServiceImplJpa   {
 
 }
