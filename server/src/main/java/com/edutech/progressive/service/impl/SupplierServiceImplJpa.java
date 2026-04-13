@@ -6,12 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.edutech.progressive.entity.Supplier;
-import com.edutech.progressive.exception.SupplierAlreadyExistsException;
-import com.edutech.progressive.exception.SupplierDoesNotExistException;
-import com.edutech.progressive.repository.ProductRepository;
-import com.edutech.progressive.repository.ShipmentRepository;
 import com.edutech.progressive.repository.SupplierRepository;
-import com.edutech.progressive.repository.WarehouseRepository;
 import com.edutech.progressive.service.SupplierService;
 
 import java.sql.SQLException;
@@ -22,29 +17,46 @@ import java.util.List;
 @Service
 public class SupplierServiceImplJpa implements SupplierService {
 
-    @Override
-    public List<Supplier> getAllSuppliers() throws SQLException {
-        return new ArrayList<>();
+    @Autowired
+    SupplierRepository supplierRepository;
+
+    public SupplierServiceImplJpa() {
+    }
+
+    public SupplierServiceImplJpa(SupplierRepository supplierRepository) {
+        this.supplierRepository = supplierRepository;
     }
 
     @Override
-    public int addSupplier(Supplier supplier) throws SQLException {
-        return -1;
+    public List<Supplier> getAllSuppliers() {
+        return supplierRepository.findAll();
     }
 
     @Override
-    public List<Supplier> getAllSuppliersSortedByName() throws SQLException {
-        return new ArrayList<>();
+    public int addSupplier(Supplier supplier) {
+        return supplierRepository.save(supplier).getSupplierId();
     }
 
-    public void updateSupplier(Supplier supplier) throws SQLException {
+    @Override
+    public List<Supplier> getAllSuppliersSortedByName() {
+        List<Supplier> sortedSuppliers = supplierRepository.findAll();
+        Collections.sort(sortedSuppliers);
+        return sortedSuppliers;
     }
 
-    public void deleteSupplier(int supplierId) throws SQLException {
+    @Override
+    public void updateSupplier(Supplier supplier) {
+        supplierRepository.save(supplier);
     }
 
-    public Supplier getSupplierById(int supplierId) throws SQLException {
-        return null;
+    @Override
+    public void deleteSupplier(int supplierId) {
+        supplierRepository.deleteBySupplierId(supplierId);
+    }
+
+    @Override
+    public Supplier getSupplierById(int supplierId) {
+        return supplierRepository.findBySupplierId(supplierId);
     }
 
 }

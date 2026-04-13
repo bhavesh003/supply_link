@@ -12,7 +12,7 @@ import com.edutech.progressive.service.SupplierService;
 @Service
 public class SupplierServiceImplArraylist implements SupplierService {
 
-    private static List<Supplier> supplierList = new ArrayList<>();
+    List<Supplier> supplierList = new ArrayList<>();
 
     @Override
     public List<Supplier> getAllSuppliers() {

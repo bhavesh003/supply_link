@@ -11,7 +11,7 @@ import com.edutech.progressive.repository.WarehouseRepository;
 import com.edutech.progressive.service.WarehouseService;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+
 import java.util.Collections;
 
 import java.util.List;
@@ -34,48 +34,45 @@ import com.edutech.progressive.service.WarehouseService;
 public class WarehouseServiceImplJpa implements WarehouseService {
 
     @Autowired
-    ProductRepository productRepository;
-
-    @Autowired
-    ShipmentRepository shipmentRepository;
-
     private WarehouseRepository warehouseRepository;
 
-    @Autowired
-    public WarehouseServiceImplJpa(WarehouseRepository warehouseRepository) {
-        this.warehouseRepository = warehouseRepository;
+    public WarehouseServiceImplJpa() {
     }
 
     @Override
-    public List<Warehouse> getAllWarehouses() throws SQLException {
-        return new ArrayList<>();
+    public List<Warehouse> getAllWarehouses() {
+        return warehouseRepository.findAll();
     }
 
     @Override
-    public int addWarehouse(Warehouse warehouse) throws SQLException {
-        return -1;
+    public int addWarehouse(Warehouse warehouse) {
+        return warehouseRepository.save(warehouse).getWarehouseId();
     }
 
     @Override
-    public List<Warehouse> getWarehousesSortedByCapacity() throws SQLException {
-        return new ArrayList<>();
+    public List<Warehouse> getWarehousesSortedByCapacity() {
+        List<Warehouse> sortedWarehouses = warehouseRepository.findAll();
+        Collections.sort(sortedWarehouses);
+        return sortedWarehouses;
     }
 
     @Override
-    public void updateWarehouse(Warehouse warehouse) throws SQLException {
+    public void updateWarehouse(Warehouse warehouse) {
+        warehouseRepository.save(warehouse);
     }
 
     @Override
-    public void deleteWarehouse(int warehouseId) throws SQLException {
+    public void deleteWarehouse(int warehouseId) {
+        warehouseRepository.deleteById(warehouseId);
     }
 
     @Override
-    public Warehouse getWarehouseById(int warehouseId) throws SQLException {
-        return null;
+    public Warehouse getWarehouseById(int warehouseId) {
+        return warehouseRepository.findByWarehouseId(warehouseId);
     }
 
     @Override
     public List<Warehouse> getWarehouseBySupplier(int supplierId) {
-        return null;
+        return warehouseRepository.findAllBySupplierId(supplierId);
     }
 }

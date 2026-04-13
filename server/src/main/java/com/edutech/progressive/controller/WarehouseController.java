@@ -1,38 +1,54 @@
 package com.edutech.progressive.controller;
 
 import com.edutech.progressive.entity.Warehouse;
+import com.edutech.progressive.service.WarehouseService;
+import com.edutech.progressive.service.impl.WarehouseServiceImplArraylist;
+import com.edutech.progressive.service.impl.WarehouseServiceImplJpa;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("/warehouses")
 public class WarehouseController {
 
+    @Autowired
+    WarehouseServiceImplJpa warehouseService;
+
+    @GetMapping
     public ResponseEntity<List<Warehouse>> getAllWarehouses() {
-        return null;
+        return new ResponseEntity<>(warehouseService.getAllWarehouses(), HttpStatus.OK);
     }
 
-    public ResponseEntity<Warehouse> getWarehouseById(int warehouseId) {
-        return null;
+    @GetMapping("/{warehouseId}")
+    public ResponseEntity<Warehouse> getWarehouseById(@PathVariable int warehouseId) {
+        return new ResponseEntity<>(warehouseService.getWarehouseById(warehouseId), HttpStatus.OK);
     }
 
-    public ResponseEntity<Integer> addWarehouse(Warehouse warehouse) {
-        return null;
+    @PostMapping
+    public ResponseEntity<Integer> addWarehouse(@RequestBody Warehouse warehouse) {
+        return new ResponseEntity<>(warehouseService.addWarehouse(warehouse), HttpStatus.OK);
     }
 
-    public ResponseEntity<Void> updateWarehouse(int warehouseId, Warehouse warehouse) {
-        return null;
+    @PutMapping("/{warehouseId}")
+    public ResponseEntity<Void> updateWarehouse(@PathVariable int warehouseId, @RequestBody Warehouse warehouse) {
+        warehouse.setWarehouseId(warehouseId);
+        warehouseService.updateWarehouse(warehouse);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    public ResponseEntity<Void> deleteWarehouse(int warehouseId) {
-        return null;
+    @DeleteMapping("/{warehouseId}")
+    public ResponseEntity<Void> deleteWarehouse(@PathVariable int warehouseId) {
+        warehouseService.deleteWarehouse(warehouseId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
-    public ResponseEntity<List<Warehouse>> getWarehousesBySupplier(int supplierId) {
-        return null;
+    @GetMapping("/supplier/{supplierId}")
+    public ResponseEntity<List<Warehouse>> getWarehousesBySupplier(@PathVariable int supplierId) {
+        return new ResponseEntity<>(warehouseService.getWarehouseBySupplier(supplierId), HttpStatus.OK);
     }
 }
