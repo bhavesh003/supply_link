@@ -1,33 +1,13 @@
 package com.edutech.progressive.service.impl;
 
-import java.sql.SQLException;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.edutech.progressive.entity.Warehouse;
-import com.edutech.progressive.repository.WarehouseRepository;
-import com.edutech.progressive.service.WarehouseService;
-
-import java.sql.SQLException;
-
 import java.util.Collections;
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Service;
 
 import com.edutech.progressive.entity.Warehouse;
-
-import com.edutech.progressive.exception.NoWarehouseFoundForSupplierException;
-
-import com.edutech.progressive.repository.ProductRepository;
-import com.edutech.progressive.repository.ShipmentRepository;
 import com.edutech.progressive.repository.WarehouseRepository;
-
 import com.edutech.progressive.service.WarehouseService;
 
 @Service
@@ -37,6 +17,10 @@ public class WarehouseServiceImplJpa implements WarehouseService {
     private WarehouseRepository warehouseRepository;
 
     public WarehouseServiceImplJpa() {
+    }
+
+    public WarehouseServiceImplJpa(WarehouseRepository warehouseRepository) {
+        this.warehouseRepository = warehouseRepository;
     }
 
     @Override
@@ -51,9 +35,9 @@ public class WarehouseServiceImplJpa implements WarehouseService {
 
     @Override
     public List<Warehouse> getWarehousesSortedByCapacity() {
-        List<Warehouse> sortedWarehouses = warehouseRepository.findAll();
-        Collections.sort(sortedWarehouses);
-        return sortedWarehouses;
+        List<Warehouse> warehouses = warehouseRepository.findAll();
+        Collections.sort(warehouses);
+        return warehouses;
     }
 
     @Override
@@ -63,7 +47,7 @@ public class WarehouseServiceImplJpa implements WarehouseService {
 
     @Override
     public void deleteWarehouse(int warehouseId) {
-        warehouseRepository.deleteById(warehouseId);
+        warehouseRepository.deleteByWarehouseId(warehouseId);
     }
 
     @Override
@@ -73,6 +57,6 @@ public class WarehouseServiceImplJpa implements WarehouseService {
 
     @Override
     public List<Warehouse> getWarehouseBySupplier(int supplierId) {
-        return warehouseRepository.findAllBySupplierId(supplierId);
+        return warehouseRepository.findBySupplier_SupplierId(supplierId);
     }
 }

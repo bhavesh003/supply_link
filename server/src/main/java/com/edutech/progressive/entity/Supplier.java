@@ -1,22 +1,35 @@
 package com.edutech.progressive.entity;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Supplier implements Comparable<Supplier> {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int supplierId;
     private String supplierName;
     private String email;
     private String phone;
     private String address;
     private String username;
+
+    @JsonIgnore
     private String password;
+
     private String role;
+
+    @OneToMany(mappedBy = "supplier")
+    @JsonIgnoreProperties({ "supplier", "products" })
+    private List<Warehouse> warehouses;
 
     public Supplier() {
     }
@@ -95,6 +108,14 @@ public class Supplier implements Comparable<Supplier> {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public List<Warehouse> getWarehouses() {
+        return warehouses;
+    }
+
+    public void setWarehouses(List<Warehouse> warehouses) {
+        this.warehouses = warehouses;
     }
 
     @Override

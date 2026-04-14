@@ -25,5 +25,5 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     @Transactional
     void deleteByProductId(int productId);
 
-    List<Product> findAllByWarehouseId(int warehouseId);
+    List<Product> findAllByWarehouse_WarehouseId(int warehouseId);
 }

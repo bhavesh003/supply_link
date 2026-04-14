@@ -11,7 +11,7 @@ import com.edutech.progressive.entity.Supplier;
 @Repository
 public interface SupplierRepository extends JpaRepository<Supplier, Integer> {
     
-    @Transactional
+    // @Transactional
     void deleteBySupplierId(int supplierId);
 
     Supplier findBySupplierId(int supplierId);

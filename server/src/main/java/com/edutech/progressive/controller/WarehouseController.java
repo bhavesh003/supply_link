@@ -1,8 +1,6 @@
 package com.edutech.progressive.controller;
 
 import com.edutech.progressive.entity.Warehouse;
-import com.edutech.progressive.service.WarehouseService;
-import com.edutech.progressive.service.impl.WarehouseServiceImplArraylist;
 import com.edutech.progressive.service.impl.WarehouseServiceImplJpa;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +11,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/warehouses")
+@RequestMapping({"/warehouse", "/warehouses"})
 public class WarehouseController {
 
     @Autowired
     WarehouseServiceImplJpa warehouseService;
+
+    public WarehouseController() {
+    }
+
+    public WarehouseController(WarehouseServiceImplJpa warehouseService) {
+        this.warehouseService = warehouseService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Warehouse>> getAllWarehouses() {
@@ -31,7 +36,7 @@ public class WarehouseController {
 
     @PostMapping
     public ResponseEntity<Integer> addWarehouse(@RequestBody Warehouse warehouse) {
-        return new ResponseEntity<>(warehouseService.addWarehouse(warehouse), HttpStatus.OK);
+        return new ResponseEntity<>(warehouseService.addWarehouse(warehouse), HttpStatus.CREATED);
     }
 
     @PutMapping("/{warehouseId}")

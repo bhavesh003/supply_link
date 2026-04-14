@@ -4,13 +4,23 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Product {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int productId;
-    private int warehouseId;
+
+    @ManyToOne
+    @JoinColumn(name = "warehouse_id")
+    @JsonIgnoreProperties({"products", "supplier"})
+    private Warehouse warehouse;
+
     private String productName;
     private String productDescription;
     private int quantity;
@@ -19,10 +29,9 @@ public class Product {
     public Product() {
     }
 
-    public Product(int productId, int warehouseId, String productName, String productDescription, int quantity,
-            Long price) {
+    public Product(int productId, Warehouse warehouse, String productName, String productDescription, int quantity, Long price) {
         this.productId = productId;
-        this.warehouseId = warehouseId;
+        this.warehouse = warehouse;
         this.productName = productName;
         this.productDescription = productDescription;
         this.quantity = quantity;
@@ -37,12 +46,12 @@ public class Product {
         this.productId = productId;
     }
 
-    public int getWarehouseId() {
-        return warehouseId;
+    public Warehouse getWarehouse() {
+        return warehouse;
     }
 
-    public void setWarehouseId(int warehouseId) {
-        this.warehouseId = warehouseId;
+    public void setWarehouse(Warehouse warehouse) {
+        this.warehouse = warehouse;
     }
 
     public String getProductName() {
@@ -76,5 +85,4 @@ public class Product {
     public void setPrice(Long price) {
         this.price = price;
     }
-
 }
