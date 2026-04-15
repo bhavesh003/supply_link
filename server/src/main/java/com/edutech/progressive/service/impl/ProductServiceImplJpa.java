@@ -1,7 +1,5 @@
 package com.edutech.progressive.service.impl;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,15 +7,12 @@ import org.springframework.stereotype.Service;
 
 import com.edutech.progressive.entity.Product;
 import com.edutech.progressive.repository.ProductRepository;
-import com.edutech.progressive.repository.ShipmentRepository;
-import com.edutech.progressive.repository.WarehouseRepository;
 import com.edutech.progressive.service.ProductService;
 
 @Service
 public class ProductServiceImplJpa implements ProductService {
 
-    @Autowired
-    ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     @Autowired
     public ProductServiceImplJpa(ProductRepository productRepository) {
@@ -31,7 +26,7 @@ public class ProductServiceImplJpa implements ProductService {
 
     @Override
     public Product getProductById(int productId) {
-        return null;
+        return productRepository.findById(productId).orElse(null);
     }
 
     @Override
@@ -41,12 +36,16 @@ public class ProductServiceImplJpa implements ProductService {
 
     @Override
     public void updateProduct(Product product) {
-        productRepository.save(product).getProductId();
+        if (productRepository.existsById(product.getProductId())) {
+            productRepository.save(product);
+        }
     }
 
     @Override
     public void deleteProduct(int productId) {
-        productRepository.deleteById(productId);
+        if (productRepository.existsById(productId)) {
+            productRepository.deleteById(productId);
+        }
     }
 
     @Override

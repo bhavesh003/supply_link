@@ -17,8 +17,8 @@ public interface ProductService {
 
     void deleteProduct(int productId) throws SQLException;
 
-    // Do not implement these methods in ProductServiceImplJdbc.java class
-    default List<Product> getAllProductByWarehouse(int warehouseId) throws SQLException {
+    // Do not implement this method in ProductServiceImplJdbc.java
+    public default List<Product> getAllProductByWarehouse(int warehouseId) throws SQLException{
         return null;
     }
 }
