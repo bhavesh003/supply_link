@@ -5,9 +5,15 @@ import com.edutech.progressive.service.impl.SupplierServiceImplArraylist;
 import com.edutech.progressive.service.impl.SupplierServiceImplJpa;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -15,53 +21,51 @@ import java.util.List;
 @RestController
 @RequestMapping("/supplier")
 public class SupplierController {
+    
+    @Autowired
+    private SupplierServiceImplArraylist supplierServiceImplArraylist;
 
     @Autowired
-    SupplierServiceImplJpa supplierService;
-
-    @Autowired
-    SupplierServiceImplArraylist supplierServiceImplArraylist;
-
+    private SupplierServiceImplJpa supplierServiceImplJpa;
+    
     @GetMapping
     public ResponseEntity<List<Supplier>> getAllSuppliers() throws SQLException {
-        return new ResponseEntity<>(supplierService.getAllSuppliers(), HttpStatus.OK);
+        return ResponseEntity.ok(supplierServiceImplJpa.getAllSuppliers());
     }
-
+    
     @GetMapping("/{supplierId}")
-    public ResponseEntity<Supplier> getSupplierById(@PathVariable int supplierId) throws SQLException {
-        return new ResponseEntity<>(supplierService.getSupplierById(supplierId), HttpStatus.OK);
-    }
+    public ResponseEntity<Supplier> getSupplierById(int supplierId) {
+        return ResponseEntity.ok(supplierServiceImplJpa.getSupplierById(supplierId));
+    } 
 
     @PostMapping
-    public ResponseEntity<Integer> addSupplier(@RequestBody Supplier supplier) throws SQLException {
-        return new ResponseEntity<>(supplierService.addSupplier(supplier), HttpStatus.CREATED);
+    public ResponseEntity<Integer> addSupplier(@RequestBody Supplier supplier) {
+        return ResponseEntity.status(201).body(supplierServiceImplJpa.addSupplier(supplier));
     }
-
+    
     @PutMapping("/{supplierId}")
-    public ResponseEntity<Void> updateSupplier(@PathVariable int supplierId, @RequestBody Supplier supplier) throws SQLException {
-        supplier.setSupplierId(supplierId);
-        supplierService.updateSupplier(supplier);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Void> updateSupplier(@PathVariable int supplierId, @RequestBody Supplier supplier) {
+        supplierServiceImplJpa.updateSupplier(supplierId,supplier);
+        return ResponseEntity.ok().build();
     }
-
+    
     @DeleteMapping("/{supplierId}")
-    public ResponseEntity<Void> deleteSupplier(@PathVariable int supplierId) throws SQLException {
-        supplierService.deleteSupplier(supplierId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Void> deleteSupplier(int supplierId) {
+        return ResponseEntity.ok().build();
     }
-
+    
     @GetMapping("/fromArrayList")
     public ResponseEntity<List<Supplier>> getAllSuppliersFromArrayList() {
-        return new ResponseEntity<>(supplierServiceImplArraylist.getAllSuppliers(), HttpStatus.OK);
+        return ResponseEntity.ok(supplierServiceImplArraylist.getAllSuppliers());
     }
-
-    @PostMapping({"/fromArrayList", "/toArrayList"})
-    public ResponseEntity<Integer> addSupplierToArrayList(@RequestBody Supplier supplier) {
-        return new ResponseEntity<>(supplierServiceImplArraylist.addSupplier(supplier), HttpStatus.CREATED);
+    
+    @PostMapping("/toArrayList")
+    public ResponseEntity<Integer> addSupplierToArrayList(Supplier supplier) {
+        return ResponseEntity.status(201).body(supplierServiceImplArraylist.addSupplier(supplier));
     }
-
-    @GetMapping("/fromArrayList/listAll")
+    
+    @GetMapping("/fromArrayList/all")
     public ResponseEntity<List<Supplier>> getAllSuppliersSortedByNameFromArrayList() {
-        return new ResponseEntity<>(supplierServiceImplArraylist.getAllSuppliersSortedByName(), HttpStatus.OK);
+        return ResponseEntity.ok(supplierServiceImplArraylist.getAllSuppliersSortedByName());
     }
 }

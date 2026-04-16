@@ -1,72 +1,81 @@
 package com.edutech.progressive.service.impl;
 
-import java.sql.SQLException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.edutech.progressive.entity.Supplier;
-import com.edutech.progressive.repository.ProductRepository;
+import com.edutech.progressive.exception.SupplierAlreadyExistsException;
+import com.edutech.progressive.exception.SupplierDoesNotExistException;
 import com.edutech.progressive.repository.SupplierRepository;
-import com.edutech.progressive.repository.WarehouseRepository;
 import com.edutech.progressive.service.SupplierService;
 
 @Service
-public class SupplierServiceImplJpa implements SupplierService {
+public class SupplierServiceImplJpa  implements SupplierService{
 
+    
+    private SupplierRepository supplierRepository;
+
+    
     @Autowired
-    SupplierRepository supplierRepository;
-
-    @Autowired
-    WarehouseRepository warehouseRepository;
-
-    @Autowired
-    ProductRepository productRepository;
-
-    public SupplierServiceImplJpa() {
-    }
-
     public SupplierServiceImplJpa(SupplierRepository supplierRepository) {
         this.supplierRepository = supplierRepository;
     }
 
-    @Override
-    public List<Supplier> getAllSuppliers() throws SQLException {
+    public List<Supplier> getAllSuppliers(){
         return supplierRepository.findAll();
     }
 
-    @Override
-    public int addSupplier(Supplier supplier) throws SQLException {
+    public int addSupplier(Supplier supplier){
+        if(supplierRepository.findByUsername(supplier.getUsername()) != null){
+            throw new SupplierAlreadyExistsException("Supplier already exists");
+        }
+        if(supplierRepository.findByEmail(supplier.getEmail()) != null){
+            throw new SupplierAlreadyExistsException("Supplier already exists");
+        }
         Supplier savedSupplier = supplierRepository.save(supplier);
         return savedSupplier.getSupplierId();
     }
 
-    @Override
-    public List<Supplier> getAllSuppliersSortedByName() throws SQLException {
-        List<Supplier> suppliers = supplierRepository.findAll();
-        Collections.sort(suppliers, Comparator.comparing(Supplier::getSupplierName));
-        return suppliers;
+    public List<Supplier> getAllSuppliersSortedByName(){
+        List<Supplier> result = supplierRepository.findAll();
+        Collections.sort(result);
+        return result;
     }
 
-    @Override
-    public void updateSupplier(Supplier supplier) throws SQLException {
-        supplierRepository.save(supplier);
+    public void updateSupplier(int supplierId, Supplier supplier){
+        if(supplierRepository.findByUsername(supplier.getUsername()) != null){
+            throw new SupplierAlreadyExistsException("Supplier Already exists");
+        } 
+        Supplier updatedSupplier = supplierRepository.findBySupplierId(supplierId);
+        if(updatedSupplier != null){
+            
+            updatedSupplier.setSupplierName(supplier.getSupplierName());
+            updatedSupplier.setEmail(supplier.getEmail());
+            updatedSupplier.setPhone(supplier.getPhone());
+            updatedSupplier.setAddress(supplier.getAddress());
+            updatedSupplier.setUsername(supplier.getUsername());
+            updatedSupplier.setPassword(supplier.getPassword());
+            updatedSupplier.setRole(supplier.getRole());
+            supplierRepository.save(supplier);
+        }
+        
     }
 
-    @Override
-    @Transactional
-    public void deleteSupplier(int supplierId) throws SQLException {
-        productRepository.deleteBySupplierId(supplierId);
-        warehouseRepository.deleteBySupplierId(supplierId);
-        supplierRepository.deleteBySupplierId(supplierId);
+    public void deleteSupplier(int supplierId){
+        supplierRepository.deleteById(supplierId);
     }
 
-    @Override
-    public Supplier getSupplierById(int supplierId) throws SQLException {
+    public Supplier getSupplierById(int supplierId){
+        if(!supplierRepository.existsById(supplierId)){
+            throw new SupplierDoesNotExistException("Supplier does not exist");
+        }
         return supplierRepository.findBySupplierId(supplierId);
     }
+
+
+
 }
