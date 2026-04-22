@@ -27,27 +27,29 @@ public class WarehouseController {
 
     @GetMapping
     public ResponseEntity<List<Warehouse>> getAllWarehouses() {
-        return null;
+        return ResponseEntity.ok(warehouseServiceImplJpa.getAllWarehouses());
     }
     
     @GetMapping("/{warehouseId}")
     public ResponseEntity<Warehouse> getWarehouseById(@PathVariable int warehouseId) {
-        return null;
+        return ResponseEntity.ok(warehouseServiceImplJpa.getWarehouseById(warehouseId));
     }  
     
     @PostMapping
     public ResponseEntity<Integer> addWarehouse(@RequestBody Warehouse warehouse) {
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return ResponseEntity.status(201).body(warehouseServiceImplJpa.addWarehouse(warehouse));
     }
     
     @PutMapping("/{warehouseId}")
     public ResponseEntity<Void> updateWarehouse(@PathVariable int warehouseId, @RequestBody Warehouse warehouse) {
-        return null;
+        warehouseServiceImplJpa.updateWarehouse(warehouse);
+        return ResponseEntity.ok().build();
     }
     
     @DeleteMapping("/{warehouseId}")
     public ResponseEntity<Void> deleteWarehouse(@PathVariable int warehouseId) {
-        return null;
+        warehouseServiceImplJpa.deleteWarehouse(warehouseId);
+        return ResponseEntity.status(204).build();
     }
 
 
