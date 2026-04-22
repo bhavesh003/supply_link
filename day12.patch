@@ -1,0 +1,751 @@
+diff --git a/server/src/main/java/com/edutech/progressive/config/Configurations.java b/server/src/main/java/com/edutech/progressive/config/Configurations.java
+index 1f9ea19..6502452 100755
+--- a/server/src/main/java/com/edutech/progressive/config/Configurations.java
++++ b/server/src/main/java/com/edutech/progressive/config/Configurations.java
+@@ -1,5 +1,32 @@
+ package com.edutech.progressive.config;
+ 
++import org.springframework.context.annotation.Bean;
++import org.springframework.context.annotation.Configuration;
++import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
++import org.springframework.security.crypto.password.PasswordEncoder;
++import org.springframework.web.servlet.config.annotation.CorsRegistry;
++import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
++
++@Configuration
+ public class Configurations {
+ 
++    @Bean
++    public PasswordEncoder passwordEncoder() {
++        return new BCryptPasswordEncoder();
++    }
++
++    @Bean
++    public WebMvcConfigurer corsConfigurer() {
++        return new WebMvcConfigurer() {
++            @Override
++            public void addCorsMappings(CorsRegistry registry) {
++                registry.addMapping("/**")
++                        .allowedMethods("GET", "POST", "PUT", "DELETE")
++                        .allowedOrigins("*")
++                        .allowedHeaders("*");
++            }
++        };
++    }
+ }
++
++////sdadadfsd
+\ No newline at end of file
+diff --git a/server/src/main/java/com/edutech/progressive/config/SecurityConfig.java b/server/src/main/java/com/edutech/progressive/config/SecurityConfig.java
+index 6a3d802..7cc7798 100755
+--- a/server/src/main/java/com/edutech/progressive/config/SecurityConfig.java
++++ b/server/src/main/java/com/edutech/progressive/config/SecurityConfig.java
+@@ -5,16 +5,75 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+ import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+ import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+ 
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.context.annotation.Bean;
++import org.springframework.context.annotation.Configuration;
++import org.springframework.http.HttpMethod;
++import org.springframework.security.authentication.AuthenticationManager;
++import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
++import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
++import org.springframework.security.config.annotation.web.builders.HttpSecurity;
++import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
++import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
++import org.springframework.security.config.http.SessionCreationPolicy;
++import org.springframework.security.core.userdetails.UserDetailsService;
++import org.springframework.security.crypto.password.PasswordEncoder;
++import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
++
++import com.edutech.progressive.jwt.JwtRequestFilter;
++
+ @Configuration
+ @EnableWebSecurity
++@EnableGlobalMethodSecurity(prePostEnabled = true)
+ public class SecurityConfig extends WebSecurityConfigurerAdapter {
++    private final UserDetailsService userDetailsService;
++    private final JwtRequestFilter jwtRequestFilter;
++    private final PasswordEncoder passwordEncoder;
++
++    @Autowired
++    public SecurityConfig(UserDetailsService userDetailsService,
++                          JwtRequestFilter jwtRequestFilter,
++                          PasswordEncoder passwordEncoder) {
++        this.userDetailsService = userDetailsService;
++        this.jwtRequestFilter = jwtRequestFilter;
++        this.passwordEncoder = passwordEncoder;
++    }
++
++
++    @Override
++    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
++        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
++    }
+ 
+     @Override
+     protected void configure(HttpSecurity http) throws Exception {
+-        http
++        http.cors().and().csrf().disable()
+                 .authorizeRequests()
+-                .anyRequest().permitAll() // Allow all requests without authentication
++                .antMatchers("/user/register", "/user/login").permitAll()
++                .antMatchers(HttpMethod.GET, "/supplier/**").hasAnyAuthority("USER", "ADMIN")
++                .antMatchers(HttpMethod.POST, "/supplier/**").hasAuthority("ADMIN")
++                .antMatchers(HttpMethod.PUT, "/supplier/**").hasAnyAuthority("ADMIN", "USER")
++                .antMatchers(HttpMethod.DELETE, "/supplier/**").hasAuthority("ADMIN")
++                .antMatchers(HttpMethod.GET, "/warehouse/**").hasAnyAuthority("USER", "ADMIN") // Repeat for accounts
++                .antMatchers(HttpMethod.POST, "/warehouse/**").hasAuthority("ADMIN")
++                .antMatchers(HttpMethod.PUT, "/warehouse/**").hasAuthority("ADMIN")
++                .antMatchers(HttpMethod.DELETE, "/warehouse/**").hasAuthority("ADMIN")
++                .antMatchers("/product/**").hasAnyAuthority("ADMIN", "USER")
++                .antMatchers("/shipment/**").hasAnyAuthority("ADMIN", "USER")
++                .antMatchers("/insurance/**").hasAnyAuthority("USER", "ADMIN")
++                .anyRequest().authenticated()
+                 .and()
+-                .csrf().disable(); // Disable CSRF protection if it's not needed
++                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
++
++        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+     }
+-}
+\ No newline at end of file
++
++    @Bean
++    @Override
++    public AuthenticationManager authenticationManagerBean() throws Exception {
++        return super.authenticationManagerBean();
++    }
++}
++
++
++//aaa
+diff --git a/server/src/main/java/com/edutech/progressive/controller/SupplierController.java b/server/src/main/java/com/edutech/progressive/controller/SupplierController.java
+index a2fda8a..e7e9fd2 100755
+--- a/server/src/main/java/com/edutech/progressive/controller/SupplierController.java
++++ b/server/src/main/java/com/edutech/progressive/controller/SupplierController.java
+@@ -1,71 +1,95 @@
+ package com.edutech.progressive.controller;
+ 
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++
+ import com.edutech.progressive.entity.Supplier;
++import com.edutech.progressive.exception.SupplierAlreadyExistsException;
++import com.edutech.progressive.exception.SupplierDoesNotExistException;
+ import com.edutech.progressive.service.impl.SupplierServiceImplArraylist;
+ import com.edutech.progressive.service.impl.SupplierServiceImplJpa;
+ 
+-import org.springframework.beans.factory.annotation.Autowired;
+-import org.springframework.http.ResponseEntity;
+-import org.springframework.web.bind.annotation.DeleteMapping;
+-import org.springframework.web.bind.annotation.GetMapping;
+-import org.springframework.web.bind.annotation.PathVariable;
+-import org.springframework.web.bind.annotation.PostMapping;
+-import org.springframework.web.bind.annotation.PutMapping;
+-import org.springframework.web.bind.annotation.RequestBody;
+-import org.springframework.web.bind.annotation.RequestMapping;
+-import org.springframework.web.bind.annotation.RestController;
+-
+ import java.sql.SQLException;
+ import java.util.List;
+ 
++
+ @RestController
+ @RequestMapping("/supplier")
+ public class SupplierController {
+-    
++
+     @Autowired
+-    private SupplierServiceImplArraylist supplierServiceImplArraylist;
++    SupplierServiceImplArraylist supplierServiceImplArraylist;
+ 
+     @Autowired
+-    private SupplierServiceImplJpa supplierServiceImplJpa;
+-    
++    SupplierServiceImplJpa supplierServiceImplJpa;
++
+     @GetMapping
+     public ResponseEntity<List<Supplier>> getAllSuppliers() throws SQLException {
+-        return ResponseEntity.ok(supplierServiceImplJpa.getAllSuppliers());
++        List<Supplier> suppliers = supplierServiceImplJpa.getAllSuppliers();
++        return new ResponseEntity<>(suppliers, HttpStatus.OK);
+     }
+-    
++
+     @GetMapping("/{supplierId}")
+-    public ResponseEntity<Supplier> getSupplierById(int supplierId) {
+-        return ResponseEntity.ok(supplierServiceImplJpa.getSupplierById(supplierId));
+-    } 
++    public ResponseEntity<?> getSupplierById(@PathVariable int supplierId) throws SQLException {
++        try {
++            Supplier supplier = supplierServiceImplJpa.getSupplierById(supplierId);
++                return new ResponseEntity<>(supplier, HttpStatus.OK);
++        } catch (SupplierDoesNotExistException e) {
++            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
++        } catch (Exception e) {
++            // Return a generic error message for any other exceptions
++            return new ResponseEntity<>("An unexpected error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
++        }
++    }
+ 
+     @PostMapping
+-    public ResponseEntity<Integer> addSupplier(@RequestBody Supplier supplier) {
+-        return ResponseEntity.status(201).body(supplierServiceImplJpa.addSupplier(supplier));
++    public ResponseEntity<?> addSupplier(@RequestBody Supplier supplier) {
++        try {
++            int supplierId = supplierServiceImplJpa.addSupplier(supplier);
++            return new ResponseEntity<>(supplierId, HttpStatus.CREATED);
++        } catch (SupplierAlreadyExistsException e) {
++            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
++        } catch (Exception e) {
++            return new ResponseEntity<>("An unexpected error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
++        }
+     }
+-    
++
+     @PutMapping("/{supplierId}")
+-    public ResponseEntity<Void> updateSupplier(@PathVariable int supplierId, @RequestBody Supplier supplier) {
+-        supplierServiceImplJpa.updateSupplier(supplierId,supplier);
+-        return ResponseEntity.ok().build();
++    public ResponseEntity<?> updateSupplier(@PathVariable int supplierId, @RequestBody Supplier supplier) {
++        try {
++            supplier.setSupplierId(supplierId);
++            supplierServiceImplJpa.updateSupplier(supplier);
++            return new ResponseEntity<>(HttpStatus.OK);
++        } catch (SupplierAlreadyExistsException e) {
++            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
++        } catch (Exception e) {
++            return new ResponseEntity<>("An unexpected error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
++        }
+     }
+-    
++
+     @DeleteMapping("/{supplierId}")
+-    public ResponseEntity<Void> deleteSupplier(int supplierId) {
+-        return ResponseEntity.ok().build();
++    public ResponseEntity<Void> deleteSupplier(@PathVariable int supplierId) {
++            supplierServiceImplJpa.deleteSupplier(supplierId);
++            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+     }
+-    
++
+     @GetMapping("/fromArrayList")
+     public ResponseEntity<List<Supplier>> getAllSuppliersFromArrayList() {
+-        return ResponseEntity.ok(supplierServiceImplArraylist.getAllSuppliers());
++        List<Supplier> suppliers = supplierServiceImplArraylist.getAllSuppliers();
++        return new ResponseEntity<>(suppliers, HttpStatus.OK);
+     }
+-    
++
+     @PostMapping("/toArrayList")
+-    public ResponseEntity<Integer> addSupplierToArrayList(Supplier supplier) {
+-        return ResponseEntity.status(201).body(supplierServiceImplArraylist.addSupplier(supplier));
++    public ResponseEntity<Integer> addSupplierToArrayList(@RequestBody Supplier supplier) {
++        int listSize = supplierServiceImplArraylist.addSupplier(supplier);
++        return new ResponseEntity<>(listSize, HttpStatus.CREATED);
+     }
+-    
++
+     @GetMapping("/fromArrayList/all")
+     public ResponseEntity<List<Supplier>> getAllSuppliersSortedByNameFromArrayList() {
+-        return ResponseEntity.ok(supplierServiceImplArraylist.getAllSuppliersSortedByName());
++        List<Supplier> supplierList = supplierServiceImplArraylist.getAllSuppliersSortedByName();
++        return new ResponseEntity<>(supplierList, HttpStatus.OK);
+     }
+ }
+\ No newline at end of file
+diff --git a/server/src/main/java/com/edutech/progressive/jwt/JwtRequestFilter.java b/server/src/main/java/com/edutech/progressive/jwt/JwtRequestFilter.java
+index 189664e..a5c096f 100755
+--- a/server/src/main/java/com/edutech/progressive/jwt/JwtRequestFilter.java
++++ b/server/src/main/java/com/edutech/progressive/jwt/JwtRequestFilter.java
+@@ -1,5 +1,67 @@
+ package com.edutech.progressive.jwt;
+ 
+-public class JwtRequestFilter  {
++import io.jsonwebtoken.*;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.context.annotation.Lazy;
++import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
++import org.springframework.security.core.GrantedAuthority;
++import org.springframework.security.core.authority.AuthorityUtils;
++import org.springframework.security.core.context.SecurityContextHolder;
++import org.springframework.security.core.userdetails.UserDetails;
++import org.springframework.security.core.userdetails.UserDetailsService;
++import org.springframework.stereotype.Component;
++import org.springframework.web.filter.OncePerRequestFilter;
+ 
++import javax.servlet.FilterChain;
++import javax.servlet.ServletException;
++import javax.servlet.http.HttpServletRequest;
++import javax.servlet.http.HttpServletResponse;
++import java.io.IOException;
++import java.util.Collection;
++
++@Component
++public class JwtRequestFilter extends OncePerRequestFilter {
++    private final UserDetailsService userDetailsService;
++    private final JwtUtil jwtUtil;
++
++    @Autowired
++    public JwtRequestFilter(UserDetailsService userDetailsService, JwtUtil jwtUtil) {
++        this.userDetailsService = userDetailsService;
++        this.jwtUtil = jwtUtil;
++    }
++
++    @Override
++    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
++                                    FilterChain filterChain) throws ServletException, IOException {
++        final String authorizationHeader = request.getHeader("Authorization");
++
++        String username = null;
++        String jwt = null;
++
++        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
++            jwt = authorizationHeader.substring(7);
++            try {
++                username = jwtUtil.extractUsername(jwt);
++            } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException |
++                     SignatureException | IllegalArgumentException e) {
++                // Handle invalid tokens here if needed
++            }
++        }
++
++        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
++            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
++
++            if (jwtUtil.validateToken(jwt, userDetails)) {
++                Claims claims = jwtUtil.extractAllClaims(jwt);
++                Collection<? extends GrantedAuthority> authorities =
++                        AuthorityUtils.createAuthorityList((String) claims.get("role"));
++
++                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
++                        userDetails, null, authorities);
++                SecurityContextHolder.getContext().setAuthentication(authentication);
++            }
++        }
++
++        filterChain.doFilter(request, response);
++    }
+ }
+diff --git a/server/src/main/java/com/edutech/progressive/jwt/JwtUtil.java b/server/src/main/java/com/edutech/progressive/jwt/JwtUtil.java
+index 0d7f794..5ca6fe1 100755
+--- a/server/src/main/java/com/edutech/progressive/jwt/JwtUtil.java
++++ b/server/src/main/java/com/edutech/progressive/jwt/JwtUtil.java
+@@ -1,5 +1,84 @@
+ package com.edutech.progressive.jwt;
+ 
++import io.jsonwebtoken.Claims;
++import io.jsonwebtoken.Jwts;
++import io.jsonwebtoken.SignatureAlgorithm;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.security.core.userdetails.UserDetails;
++import org.springframework.stereotype.Component;
++
++import com.edutech.progressive.entity.Supplier;
++import com.edutech.progressive.repository.SupplierRepository;
++
++import java.util.Date;
++import java.util.HashMap;
++import java.util.Map;
++
++@Component
+ public class JwtUtil {
++    // @Autowired
++    private SupplierRepository supplierRepository;
++
++    @Autowired
++    public JwtUtil(SupplierRepository supplierRepository) {
++        this.supplierRepository = supplierRepository;
++    }
++
++    private final String secret = "secretKey000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
++
++    private final int expiration = 86400;
++
++    public String generateToken(String username) {
++        Date now = new Date();
++        Date expiryDate = new Date(now.getTime() + expiration * 1000);
++        Supplier user = supplierRepository.findByUsername(username);
++
++        Map<String, Object> claims = new HashMap<>();
++        claims.put("sub", username);
++
++        // Assign role based on user type
++        claims.put("role", user.getRole());
++
++        return Jwts.builder()
++                .setClaims(claims)
++                .setIssuedAt(now)
++                .setExpiration(expiryDate)
++                .signWith(SignatureAlgorithm.HS512, secret)
++                .compact();
++    }
++
++    public Claims extractAllClaims(String token) {
++        Claims claims;
++        try {
++            claims = Jwts.parser()
++                    .setSigningKey(secret)
++                    .parseClaimsJws(token)
++                    .getBody();
++        } catch (Exception e) {
++            claims = null;
++        }
++        return claims;
++    }
++
++    public String extractUsername(String token) {
++        Claims claims = Jwts.parser()
++                .setSigningKey(secret)
++                .parseClaimsJws(token)
++                .getBody();
++        return claims.getSubject();
++    }
++
++    public boolean isTokenExpired(String token) {
++        Date expirationDate = Jwts.parser()
++                .setSigningKey(secret)
++                .parseClaimsJws(token)
++                .getBody()
++                .getExpiration();
++        return expirationDate.before(new Date());
++    }
+ 
+-}
+\ No newline at end of file
++    public boolean validateToken(String token, UserDetails userDetails) {
++        final String username = extractUsername(token);
++        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
++    }
++}
+diff --git a/server/src/main/java/com/edutech/progressive/repository/SupplierRepository.java b/server/src/main/java/com/edutech/progressive/repository/SupplierRepository.java
+index dfb641c..f3b9b1a 100755
+--- a/server/src/main/java/com/edutech/progressive/repository/SupplierRepository.java
++++ b/server/src/main/java/com/edutech/progressive/repository/SupplierRepository.java
+@@ -1,11 +1,6 @@
+ package com.edutech.progressive.repository;
+ 
+-import java.util.Optional;
+-
+-import javax.transaction.Transactional;
+-
+ import org.springframework.data.jpa.repository.JpaRepository;
+-import org.springframework.data.jpa.repository.Modifying;
+ import org.springframework.data.jpa.repository.Query;
+ import org.springframework.data.repository.query.Param;
+ import org.springframework.stereotype.Repository;
+@@ -13,18 +8,13 @@ import org.springframework.stereotype.Repository;
+ import com.edutech.progressive.entity.Supplier;
+ 
+ @Repository
+-public interface SupplierRepository extends JpaRepository<Supplier, Integer>{
+-    @Modifying
+-    @Transactional
+-    @Query("delete from Supplier s where s.supplierId = :supplierId")
++public interface SupplierRepository extends JpaRepository<Supplier, Integer> {
++
+     void deleteBySupplierId(@Param("supplierId") int supplierId);
+-    
+-    @Query("select s from Supplier s where s.supplierId = :supplierId")
++
+     Supplier findBySupplierId(@Param("supplierId") int supplierId);
+-    
+-    @Query("select s from Supplier s where s.supplierName = :supplierName")
+-    Supplier findByUsername(@Param("supplierName") String username);
+-     
+-    @Query("select s from Supplier s where s.email = :email")
+-    Supplier findByEmail(@Param("email") String email);
++
++    Supplier findByUsername(String username);
++
++    Supplier findByEmail(String email);
+ }
+\ No newline at end of file
+diff --git a/server/src/main/java/com/edutech/progressive/repository/WarehouseRepository.java b/server/src/main/java/com/edutech/progressive/repository/WarehouseRepository.java
+index c944e0a..8ec86d1 100755
+--- a/server/src/main/java/com/edutech/progressive/repository/WarehouseRepository.java
++++ b/server/src/main/java/com/edutech/progressive/repository/WarehouseRepository.java
+@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
+ import com.edutech.progressive.entity.Warehouse;
+ 
+ @Repository
+-public interface WarehouseRepository extends JpaRepository<Warehouse, Long> {
++public interface WarehouseRepository extends JpaRepository<Warehouse, Integer> {
+ 
+     @Query("select w from Warehouse w where w.warehouseId = :warehouseId")
+     Warehouse findByWarehouseId(@Param("warehouseId") int warehouseId);
+diff --git a/server/src/main/java/com/edutech/progressive/service/LoginService.java b/server/src/main/java/com/edutech/progressive/service/LoginService.java
+index f0ccdd8..0a7185f 100755
+--- a/server/src/main/java/com/edutech/progressive/service/LoginService.java
++++ b/server/src/main/java/com/edutech/progressive/service/LoginService.java
+@@ -1,39 +1,79 @@
+ package com.edutech.progressive.service;
+ 
+ import com.edutech.progressive.entity.Supplier;
++import com.edutech.progressive.exception.SupplierAlreadyExistsException;
++import com.edutech.progressive.repository.SupplierRepository;
++
++import org.springframework.security.core.userdetails.UserDetails;
++import org.springframework.security.core.userdetails.UserDetailsService;
++
++import java.util.List;
++import java.util.Optional;
++
++import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.security.core.userdetails.UserDetails;
+ import org.springframework.security.core.userdetails.UserDetailsService;
++import org.springframework.security.core.userdetails.UsernameNotFoundException;
++import org.springframework.security.crypto.password.PasswordEncoder;
++import org.springframework.stereotype.Service;
+ 
++import java.util.ArrayList;
+ import java.util.List;
+ import java.util.Optional;
+ 
++@Service
+ public class LoginService implements UserDetailsService {
+ 
++    private final SupplierRepository supplierRepository;
++
++    private final PasswordEncoder passwordEncoder;
++
++    @Autowired
++    public LoginService(SupplierRepository supplierRepository, PasswordEncoder passwordEncoder) {
++        this.supplierRepository = supplierRepository;
++        this.passwordEncoder = passwordEncoder;
++    }
++
+     public List<Supplier> getAllUsers() {
+-        return null;
++        return supplierRepository.findAll();
+     }
+ 
+-    public Optional<Supplier> getUserById(Integer userId) {
+-        return null;
++    public Optional<Supplier> getUserById(int userId) {
++        return supplierRepository.findById(userId);
+     }
+ 
+     public Supplier getSupplierByName(String username) {
+-        return null;
++        return supplierRepository.findByUsername(username);
+     }
+ 
+     public Supplier createUser(Supplier user) {
+-        return null;
++        Supplier oldUser = supplierRepository.findByUsername(user.getUsername());
++        if (oldUser != null) {
++            throw new SupplierAlreadyExistsException("User name Is Unavailable: " + user.getUsername());
++
++        }
++        user.setPassword(passwordEncoder.encode(user.getPassword()));
++        return supplierRepository.save(user);
+     }
+ 
+     public Supplier updateUser(Supplier user) {
+-        return null;
++        return supplierRepository.save(user);
+     }
+ 
+-    public void deleteUser(Integer id) {
++    public void deleteUser(int id) {
++        supplierRepository.deleteBySupplierId(id);
+     }
+ 
+     @Override
+     public UserDetails loadUserByUsername(String username) {
+-        return null;
++        Supplier user = supplierRepository.findByUsername(username);
++        if (user == null) {
++            throw new UsernameNotFoundException("User not found");
++        }
++
++        return new org.springframework.security.core.userdetails.User(
++                user.getUsername(),
++                user.getPassword(),
++                new ArrayList<>());
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/server/src/main/java/com/edutech/progressive/service/impl/SupplierServiceImplJpa.java b/server/src/main/java/com/edutech/progressive/service/impl/SupplierServiceImplJpa.java
+index fed81d0..fbea232 100755
+--- a/server/src/main/java/com/edutech/progressive/service/impl/SupplierServiceImplJpa.java
++++ b/server/src/main/java/com/edutech/progressive/service/impl/SupplierServiceImplJpa.java
+@@ -14,45 +14,43 @@ import com.edutech.progressive.repository.SupplierRepository;
+ import com.edutech.progressive.service.SupplierService;
+ 
+ @Service
+-public class SupplierServiceImplJpa  implements SupplierService{
++public class SupplierServiceImplJpa implements SupplierService {
+ 
+-    
+     private SupplierRepository supplierRepository;
+ 
+-    
+     @Autowired
+     public SupplierServiceImplJpa(SupplierRepository supplierRepository) {
+         this.supplierRepository = supplierRepository;
+     }
+ 
+-    public List<Supplier> getAllSuppliers(){
++    public List<Supplier> getAllSuppliers() {
+         return supplierRepository.findAll();
+     }
+ 
+-    public int addSupplier(Supplier supplier){
+-        if(supplierRepository.findByUsername(supplier.getUsername()) != null){
++    public int addSupplier(Supplier supplier) {
++        if (supplierRepository.findByUsername(supplier.getUsername()) != null) {
+             throw new SupplierAlreadyExistsException("Supplier already exists");
+         }
+-        if(supplierRepository.findByEmail(supplier.getEmail()) != null){
++        if (supplierRepository.findByEmail(supplier.getEmail()) != null) {
+             throw new SupplierAlreadyExistsException("Supplier already exists");
+         }
+         Supplier savedSupplier = supplierRepository.save(supplier);
+         return savedSupplier.getSupplierId();
+     }
+ 
+-    public List<Supplier> getAllSuppliersSortedByName(){
++    public List<Supplier> getAllSuppliersSortedByName() {
+         List<Supplier> result = supplierRepository.findAll();
+         Collections.sort(result);
+         return result;
+     }
+ 
+-    public void updateSupplier(int supplierId, Supplier supplier){
+-        if(supplierRepository.findByUsername(supplier.getUsername()) != null){
++    public void updateSupplier(int supplierId, Supplier supplier) {
++        if (supplierRepository.findByUsername(supplier.getUsername()) != null) {
+             throw new SupplierAlreadyExistsException("Supplier Already exists");
+-        } 
++        }
+         Supplier updatedSupplier = supplierRepository.findBySupplierId(supplierId);
+-        if(updatedSupplier != null){
+-            
++        if (updatedSupplier != null) {
++
+             updatedSupplier.setSupplierName(supplier.getSupplierName());
+             updatedSupplier.setEmail(supplier.getEmail());
+             updatedSupplier.setPhone(supplier.getPhone());
+@@ -62,20 +60,18 @@ public class SupplierServiceImplJpa  implements SupplierService{
+             updatedSupplier.setRole(supplier.getRole());
+             supplierRepository.save(supplier);
+         }
+-        
++
+     }
+ 
+-    public void deleteSupplier(int supplierId){
++    public void deleteSupplier(int supplierId) {
+         supplierRepository.deleteById(supplierId);
+     }
+ 
+-    public Supplier getSupplierById(int supplierId){
+-        if(!supplierRepository.existsById(supplierId)){
++    public Supplier getSupplierById(int supplierId) {
++        if (!supplierRepository.existsById(supplierId)) {
+             throw new SupplierDoesNotExistException("Supplier does not exist");
+         }
+         return supplierRepository.findBySupplierId(supplierId);
+     }
+ 
+-
+-
+ }
+\ No newline at end of file
+diff --git a/server/target/classes/com/edutech/progressive/config/Configurations$1.class b/server/target/classes/com/edutech/progressive/config/Configurations$1.class
+new file mode 100644
+index 0000000..931f935
+Binary files /dev/null and b/server/target/classes/com/edutech/progressive/config/Configurations$1.class differ
+diff --git a/server/target/classes/com/edutech/progressive/config/Configurations.class b/server/target/classes/com/edutech/progressive/config/Configurations.class
+index 965d77a..92fcb49 100755
+Binary files a/server/target/classes/com/edutech/progressive/config/Configurations.class and b/server/target/classes/com/edutech/progressive/config/Configurations.class differ
+diff --git a/server/target/classes/com/edutech/progressive/config/SecurityConfig.class b/server/target/classes/com/edutech/progressive/config/SecurityConfig.class
+index 81b6aeb..4451e3c 100755
+Binary files a/server/target/classes/com/edutech/progressive/config/SecurityConfig.class and b/server/target/classes/com/edutech/progressive/config/SecurityConfig.class differ
+diff --git a/server/target/classes/com/edutech/progressive/controller/SupplierController.class b/server/target/classes/com/edutech/progressive/controller/SupplierController.class
+index 89b600a..7c197cf 100755
+Binary files a/server/target/classes/com/edutech/progressive/controller/SupplierController.class and b/server/target/classes/com/edutech/progressive/controller/SupplierController.class differ
+diff --git a/server/target/classes/com/edutech/progressive/jwt/JwtRequestFilter.class b/server/target/classes/com/edutech/progressive/jwt/JwtRequestFilter.class
+index 9f201ce..7379bf7 100755
+Binary files a/server/target/classes/com/edutech/progressive/jwt/JwtRequestFilter.class and b/server/target/classes/com/edutech/progressive/jwt/JwtRequestFilter.class differ
+diff --git a/server/target/classes/com/edutech/progressive/jwt/JwtUtil.class b/server/target/classes/com/edutech/progressive/jwt/JwtUtil.class
+index 5c35916..44e95d3 100755
+Binary files a/server/target/classes/com/edutech/progressive/jwt/JwtUtil.class and b/server/target/classes/com/edutech/progressive/jwt/JwtUtil.class differ
+diff --git a/server/target/classes/com/edutech/progressive/repository/SupplierRepository.class b/server/target/classes/com/edutech/progressive/repository/SupplierRepository.class
+index 62fe97f..c803d52 100755
+Binary files a/server/target/classes/com/edutech/progressive/repository/SupplierRepository.class and b/server/target/classes/com/edutech/progressive/repository/SupplierRepository.class differ
+diff --git a/server/target/classes/com/edutech/progressive/repository/WarehouseRepository.class b/server/target/classes/com/edutech/progressive/repository/WarehouseRepository.class
+index 6841e32..9478fda 100755
+Binary files a/server/target/classes/com/edutech/progressive/repository/WarehouseRepository.class and b/server/target/classes/com/edutech/progressive/repository/WarehouseRepository.class differ
+diff --git a/server/target/classes/com/edutech/progressive/service/LoginService.class b/server/target/classes/com/edutech/progressive/service/LoginService.class
+index ee31a46..efb12da 100755
+Binary files a/server/target/classes/com/edutech/progressive/service/LoginService.class and b/server/target/classes/com/edutech/progressive/service/LoginService.class differ
+diff --git a/server/target/classes/com/edutech/progressive/service/impl/SupplierServiceImplJpa.class b/server/target/classes/com/edutech/progressive/service/impl/SupplierServiceImplJpa.class
+index 3781bbf..41ff58e 100755
+Binary files a/server/target/classes/com/edutech/progressive/service/impl/SupplierServiceImplJpa.class and b/server/target/classes/com/edutech/progressive/service/impl/SupplierServiceImplJpa.class differ
+diff --git a/server/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst b/server/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
+new file mode 100644
+index 0000000..e69de29
+diff --git a/server/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst b/server/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+new file mode 100644
+index 0000000..1f5537d
+--- /dev/null
++++ b/server/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+@@ -0,0 +1,50 @@
++/home/coder/app/server/src/main/java/com/edutech/progressive/config/Configurations.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/LoginService.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/config/DatabaseConnectionManager.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/jwt/JwtUtil.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/impl/ShipmentServiceImpl.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/entity/Insurance.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/dao/WarehouseDAO.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/jwt/JwtRequestFilter.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/config/SecurityConfig.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/InsuranceService.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/impl/InsuranceServiceImpl.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/impl/WarehouseServiceImplArraylist.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/controller/InsuranceController.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/dao/ProductDAOImpl.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/impl/WarehouseServiceImplJdbc.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/dao/WarehouseDAOImpl.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/repository/InsuranceRepository.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/entity/Warehouse.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/repository/WarehouseRepository.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/impl/SupplierServiceImplArraylist.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/controller/WarehouseController.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/exception/SupplierAlreadyExistsException.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/exception/NoWarehouseFoundForSupplierException.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/dto/LoginRequest.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/dao/ProductDAO.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/repository/ProductRepository.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/dto/LoginResponse.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/controller/ShipmentController.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/repository/ShipmentRepository.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/dao/SupplierDAO.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/controller/LoginController.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/controller/SupplierController.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/impl/ProductServiceImplJpa.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/repository/SupplierRepository.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/ProductService.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/exception/InsufficientCapacityException.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/WarehouseService.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/entity/Supplier.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/SupplyLinkApplication.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/impl/SupplierServiceImplJdbc.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/ShipmentService.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/SupplierService.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/controller/ProductController.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/exception/SupplierDoesNotExistException.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/impl/WarehouseServiceImplJpa.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/entity/Product.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/entity/Shipment.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/impl/SupplierServiceImplJpa.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/dao/SupplierDAOImpl.java
++/home/coder/app/server/src/main/java/com/edutech/progressive/service/impl/ProductServiceImplJdbc.java
