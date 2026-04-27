@@ -1,16 +1,52 @@
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { BehaviorSubject } from 'rxjs';
 import { Supplier } from '../../types/Supplier';
-import { Component } from '@angular/core';
+
+
 
 @Component({
-    selector: 'supplier-component',
-    imports: [ReactiveFormsModule],
-    template: '<label for = "name">Name: </label> <input id = "name" type = "text" [(ngModel)] = "supplierForm.supplierName"/><label for = "email">Email:</label><input id = "email" type = "text" [(ngModel)] = "supplierForm.email"/><label for = "username">Username:</label><input id = "text" type = "text" [(ngModel)] = "supplierForm.username" /><label for = "password">Password:</label><input id = "password" type = "password" [(ngModel)] = "supplierForm.password"/><btn onclick() = "onSubmit()">Submit</bt> '
+    selector: 'app-supplier',
+    templateUrl: './supplier.component.html',
+    styleUrls: ['./supplier.component.scss']
 })
-export class SupplierComponent {
+export class SupplierComponent implements OnInit {
+    supplierForm!: FormGroup;
 
-    supplierForm = new Supplier(1, "", "", "", "", "", "", "");
-    ngOninit() {
+    supplier: Supplier = new Supplier(
+        1,
+        'Alice Johnson',
+        'alice@example.com',
+        '1234567890',
+        '123 Main St',
+        'alicej',
+        'pass123',
+        'Admin'
+    );
 
+    supplierSuccess$ = new BehaviorSubject<boolean>(false);
+    supplierError$ = new BehaviorSubject<boolean>(false);
+
+    constructor(private fb: FormBuilder) { }
+
+    ngOnInit(): void {
+        this.supplierForm = this.fb.group({
+            name: ['', Validators.required],
+            email: ['', [Validators.required, Validators.email]],
+            username: ['', Validators.required],
+            password: ['', Validators.required]
+        });
+    }
+
+    onSubmit(): void {
+        if (this.supplierForm.valid) {
+            this.supplierSuccess$.next(true);
+            this.supplierError$.next(false);
+            console.log('Supplier created:', this.supplierForm.value);
+            this.supplierForm.reset();
+        } else {
+            this.supplierSuccess$.next(false);
+            this.supplierError$.next(true);
+        }
     }
 }
