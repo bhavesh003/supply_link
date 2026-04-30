@@ -1,27 +1,22 @@
 <form [formGroup]="warehouseForm" (ngSubmit)="onSubmit()" class="user-form">
 
   <div class="form-group">
-    <label>Warehouse ID </label>
-    <input type="number" formControlName="warehouseId" />
-  </div>
-
-  <div class="form-group">
-    <label>Supplier ID </label>
+    <label>Supplier ID *</label>
     <input type="number" formControlName="supplierId" />
   </div>
 
   <div class="form-group">
-    <label>Warehouse Name </label>
+    <label>Warehouse Name *</label>
     <input type="text" formControlName="warehouseName" />
   </div>
 
   <div class="form-group">
-    <label>Location </label>
+    <label>Location</label>
     <input type="text" formControlName="location" />
   </div>
 
   <div class="form-group">
-    <label>Capacity </label>
+    <label>Capacity *</label>
     <input type="number" formControlName="capacity" />
   </div>
 
