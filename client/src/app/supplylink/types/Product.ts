@@ -1,31 +1,27 @@
+import { Warehouse } from "./Warehouse";
+
 export class Product {
-  productId: number;
-//  warehouseId: string;
-  productName: string;
-  productDescription: string;
-  quantity: number;
-  price: number;
+    productId: number;
+    warehouse: Warehouse;
+    productName: string;
+    productDescription: string;
+    quantity: number;
+    price: number;
 
-  constructor(
-    productId: number,
-   // warehouseId: string,
-    productName: string,
-    productDescription: string,
-    quantity: number,
-    price: number
-  ) {
-    this.productId = productId;
-    //this.warehouseId = warehouseId;
-    this.productName = productName;
-    this.productDescription = productDescription;
-    this.quantity = quantity;
-    this.price = price;
-  }
+    constructor(
+        productId: number,
+        warehouse: Warehouse,
+        productName: string,
+        productDescription: string,
+        quantity: number,
+        price: number
+    ) {
+        this.productId = productId;
+        this.warehouse = warehouse;
+        this.productName = productName;
+        this.productDescription = productDescription;
+        this.quantity = quantity;
+        this.price = price;
+    }
 
-  // displayInfo() {
-  //   // Labels must match regex in tests; 'quantity' is lowercase
-  //   console.log(`Product ID: ${this.productId}`);
-  //   console.log(`Warehouse ID: ${this.warehouseId}`);
-  //   console.log(`quantity: ${this.quantity}`);
-  // }
 }
