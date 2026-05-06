@@ -1,41 +1,27 @@
 package com.edutech.progressive.entity;
-
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Supplier implements Comparable<Supplier> {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int supplierId;
     private String supplierName;
     private String email;
     private String phone;
     private String address;
     private String username;
-
-    @JsonIgnore
     private String password;
-
     private String role;
-
-    @OneToMany(mappedBy = "supplier")
-    @JsonIgnoreProperties({ "supplier", "products" })
-    private List<Warehouse> warehouses;
 
     public Supplier() {
     }
 
-    public Supplier(int supplierId, String supplierName, String email, String phone, String address, String username,
-            String password, String role) {
+    public Supplier(int supplierId, String supplierName, String email, String phone, String address, String username, String password, String role) {
         this.supplierId = supplierId;
         this.supplierName = supplierName;
         this.email = email;
@@ -44,6 +30,10 @@ public class Supplier implements Comparable<Supplier> {
         this.username = username;
         this.password = password;
         this.role = role;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public int getSupplierId() {
@@ -62,8 +52,20 @@ public class Supplier implements Comparable<Supplier> {
         this.supplierName = supplierName;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setEmail(String email) {
@@ -86,22 +88,6 @@ public class Supplier implements Comparable<Supplier> {
         this.address = address;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getRole() {
         return role;
     }
@@ -110,16 +96,9 @@ public class Supplier implements Comparable<Supplier> {
         this.role = role;
     }
 
-    public List<Warehouse> getWarehouses() {
-        return warehouses;
-    }
-
-    public void setWarehouses(List<Warehouse> warehouses) {
-        this.warehouses = warehouses;
-    }
-
     @Override
-    public int compareTo(Supplier arg0) {
-        return this.getSupplierName().compareTo(arg0.getSupplierName());
+    public int compareTo(Supplier otherSupplier) {
+        // Implement comparison logic based on account balance
+        return this.getSupplierName().compareTo(otherSupplier.getSupplierName());
     }
 }
