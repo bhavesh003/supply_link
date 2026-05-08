@@ -29,9 +29,9 @@ public class DatabaseConnectionManager {
     public static Connection getConnection() {
         try {
             return DriverManager.getConnection(
-                    properties.getProperty("jdbc.url"),
-                    properties.getProperty("jdbc.username"),
-                    properties.getProperty("jdbc.password"));
+                    properties.getProperty("spring.datasource.url"),
+                    properties.getProperty("spring.datasource.username"),
+                    properties.getProperty("spring.datasource.password"));
         } catch (Exception e) {
             throw new RuntimeException("Failed to establish database connection", e);
         }
