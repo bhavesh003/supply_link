@@ -9,83 +9,77 @@ import com.edutech.progressive.dao.WarehouseDAO;
 import com.edutech.progressive.entity.Warehouse;
 import com.edutech.progressive.service.WarehouseService;
 
-public class WarehouseServiceImplJdbc implements WarehouseService  {
-    private WarehouseDAO warehouseDAO;
-
+public class WarehouseServiceImplJdbc implements WarehouseService {
+private WarehouseDAO warehouseDAO;
+ 
     public WarehouseServiceImplJdbc(WarehouseDAO warehouseDAO) {
-        this.warehouseDAO = warehouseDAO;
-    }
-
+    this.warehouseDAO = warehouseDAO;
+}
+ 
     @Override
-    public List<Warehouse> getAllWarehouses() {
-        try {
-            return warehouseDAO.getAllWarehouse();
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+    public List<Warehouse> getAllWarehouses()throws SQLException {
+           try{
+       return warehouseDAO.getAllWarehouse();
+        }catch(SQLException e){
+           throw e;
+        }finally{
+ 
         }
-        return null;
     }
-
+ 
     @Override
-    public int addWarehouse(Warehouse warehouse) {
-        try {
-            return warehouseDAO.addWarehouse(warehouse);
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return -1;
+    public int addWarehouse(Warehouse warehouse) throws SQLException{
+           try{
+         return warehouseDAO.addWarehouse(warehouse);
+    }catch(SQLException e){
+        throw e;
+    }finally{
+ 
     }
-
+    }
+ 
     @Override
-    public List<Warehouse> getWarehousesSortedByCapacity() {
-        List<Warehouse> sortWarehouses;
-        try {
-            sortWarehouses = warehouseDAO.getAllWarehouse();
-            Collections.sort(sortWarehouses, Comparator.comparing(Warehouse::getCapacity));
+    public List<Warehouse> getWarehousesSortedByCapacity() throws SQLException{
+          try{
+        List<Warehouse> sortWarehouses=warehouseDAO.getAllWarehouse();
+        Collections.sort(sortWarehouses,Comparator.comparing(Warehouse::getCapacity));
         return sortWarehouses;
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
+       }catch(SQLException e){
+        throw e;
+       }
+       finally{
+ 
+       }
     }
-
     @Override
-    public void updateWarehouse(Warehouse warehouse) {
-        try {
-            warehouseDAO.updateWarehouse(warehouse);
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void deleteWarehouse(int warehouseId) {
-        try {
-            warehouseDAO.deleteWarehouse(warehouseId);
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+     public  void updateWarehouse(Warehouse warehouse)throws SQLException {
+        try{
+     warehouseDAO.updateWarehouse(warehouse);
+        }catch(SQLException e){
+            throw e;
+        }finally{
+ 
         }
     }
-
     @Override
-    public Warehouse getWarehouseById(int warehouseId) {
-        try {
-            return warehouseDAO.getWarehouseById(warehouseId);
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
+    public  void deleteWarehouse(int warehouseId)throws SQLException {
+           try{
+        warehouseDAO.deleteWarehouse(warehouseId);
+      }catch(SQLException e){
+        throw e;
+      }finally{
+      }
     }
-
     @Override
-    public List<Warehouse> getWarehouseBySupplier(int supplierId) {
-        return null;
+    public  Warehouse getWarehouseById(int warehouseId)throws SQLException {
+           try{
+              return warehouseDAO.getWarehouseById(warehouseId);
+    }catch(SQLException e){
+        throw e;
+    }finally{
+ 
     }
-
+    }
+ 
+ 
 }

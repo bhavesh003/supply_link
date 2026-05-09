@@ -1,164 +1,163 @@
-/* Reset */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-}
-
-/* Global styles */
-body {
+  }
+  
+  /* global styles */
+  body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
-}
-
-/* Container for layout */
-.container {
+    font-family: arial, sans-serif;
+  }
+  
+  /* container for layout */
+  .container {
     width: 100%;
     max-width: 1200px;
-    /* Limit container width */
+    /* limit container width */
     margin: 0 auto;
     padding: 20px;
-    /* Add padding for better spacing */
-}
-
-/* Clearfix for row */
-.row::after {
+    /* add padding for better spacing */
+  }
+  
+  /* clearfix for row */
+  .row::after {
     content: "";
     clear: both;
     display: table;
-}
-
-/* Column layout system */
-[class*="col-"] {
+  }
+  
+  /* column layout system */
+  [class*="col-"] {
     float: left;
     padding: 10px;
-    /* Add padding to columns for spacing */
-}
-
-.col-1 {
+    /* add padding to columns for spacing */
+  }
+  
+  .col-1 {
     width: 8.33%;
-}
-
-.col-2 {
+  }
+  
+  .col-2 {
     width: 16.67%;
-}
-
-.col-3 {
+  }
+  
+  .col-3 {
     width: 25%;
-}
-
-.col-4 {
+  }
+  
+  .col-4 {
     width: 33.33%;
-}
-
-.col-5 {
+  }
+  
+  .col-5 {
     width: 41.67%;
-}
-
-.col-6 {
+  }
+  
+  .col-6 {
     width: 50%;
-}
-
-.col-7 {
+  }
+  
+  .col-7 {
     width: 58.33%;
-}
-
-.col-8 {
+  }
+  
+  .col-8 {
     width: 66.67%;
-}
-
-.col-9 {
+  }
+  
+  .col-9 {
     width: 75%;
-}
-
-.col-10 {
+  }
+  
+  .col-10 {
     width: 83.33%;
-}
-
-.col-11 {
+  }
+  
+  .col-11 {
     width: 91.67%;
-}
-
-.col-12 {
+  }
+  
+  .col-12 {
     width: 100%;
-}
-
-/* Card component */
-.card {
+  }
+  
+  /* card component */
+  .card {
     margin: 10px 0;
-    /* Add margin for separation */
+    /* add margin for separation */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    /* Add a subtle shadow for better visibility */
+    /* add a subtle shadow for better visibility */
     border: 1px solid #ddd;
     border-radius: 4px;
-}
-
-.card-body {
+  }
+  
+  .card-body {
     padding: 15px;
-    /* Increase padding for better spacing */
-}
-
-.card-title {
+    /* increase padding for better spacing */
+  }
+  
+  .card-title {
     font-size: 18px;
     font-weight: bold;
-    /* Add emphasis */
-}
-
-.card-text {
+    /* add emphasis */
+  }
+  
+  .card-text {
     font-size: 14px;
     color: #555;
-    /* Add a softer color */
-}
-
-/* Form styling */
-.user-form {
+    /* add a softer color */
+  }
+  
+  /* form styling */
+  .user-form {
     max-width: 400px;
     margin: 20px auto;
-    /* Center the form */
+    /* center the form */
     padding: 20px;
     background-color: #f9f9f9;
-    /* Use a softer background color */
+    /* use a softer background color */
     border: 1px solid #ddd;
     border-radius: 4px;
-}
-
-.form-group {
+  }
+  
+  .form-group {
     margin-bottom: 20px;
-}
-
-label {
+  }
+  
+  label {
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
-    /* Add spacing between label and input */
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"],
-select {
+    /* add spacing between label and input */
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  select {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
-    /* Increase font size for better readability */
+    /* increase font size for better readability */
     transition: border-color 0.3s ease;
-    /* Add a smooth transition for input focus */
-}
-
-input[type="text"]:focus,
-input[type="password"]:focus,
-select:focus {
+    /* add a smooth transition for input focus */
+  }
+  
+  input[type="text"]:focus,
+  input[type="password"]:focus,
+  select:focus {
     border-color: #007bff;
-    /* Change border color on focus */
+    /* change border color on focus */
     outline: none;
-    /* Remove default outline */
-}
-
-/* Button styling */
-button.btn-submit {
+    /* remove default outline */
+  }
+  
+  /* button styling */
+  button.btn-submit {
     display: block;
     width: 100%;
     padding: 12px 0;
@@ -169,53 +168,53 @@ button.btn-submit {
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-    /* Increase font size for better readability */
+    /* increase font size for better readability */
     transition: background-color 0.3s ease;
-}
-
-button.btn-submit:hover {
+  }
+  
+  button.btn-submit:hover {
     background-color: #0056b3;
-    /* Darken button on hover */
-}
-
-button.btn-submit:focus {
+    /* darken button on hover */
+  }
+  
+  button.btn-submit:focus {
     outline: none;
     background-color: #0056b3;
-}
-
-/* Link styling */
-a.task-list {
+  }
+  
+  /* link styling */
+  a.task-list {
     display: block;
     margin-top: 20px;
     text-align: center;
     text-decoration: none;
     color: #007bff;
     transition: color 0.3s ease;
-}
-
-a.task-list:hover {
+  }
+  
+  a.task-list:hover {
     text-decoration: underline;
     color: #0056b3;
-    /* Darken link color on hover */
-}
-
-/* Error and success messages */
-.error {
+    /* darken link color on hover */
+  }
+  
+  /* error and success messages */
+  .error {
     color: red;
     margin-top: 10px;
     text-align: center;
-    /* Error color */
-}
-
-.success {
+    /* error color */
+  }
+  
+  .success {
     margin-top: 10px;
     color: #28a745;
-    /* Success color */
-}
-
-/* Responsive improvements */
-@media (max-width: 768px) {
-
+    /* success color */
+  }
+  
+  /* responsive improvements */
+  @media (max-width: 768px) {
+  
     .col-1,
     .col-2,
     .col-3,
@@ -229,13 +228,13 @@ a.task-list:hover {
     .col-11,
     .col-12 {
         width: 100%;
-        /* Make columns stack on smaller screens */
+        /* make columns stack on smaller screens */
         padding: 5px;
-        /* Reduce padding on smaller screens */
+        /* reduce padding on smaller screens */
     }
-
+  
     .container {
         padding: 10px;
-        /* Reduce container padding on smaller screens */
+        /* reduce container padding on smaller screens */
     }
-}
+  }

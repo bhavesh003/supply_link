@@ -9,11 +9,12 @@ public class LoginResponse {
    private Integer userId;
 
    @JsonCreator
-   public LoginResponse(@JsonProperty("token") String token, String roles, Integer userId) {
+   public LoginResponse(@JsonProperty("token") String token , String roles, Integer userId) {
       this.token = token;
-      this.roles = roles;
-      this.userId = userId;
+      this.roles=roles;
+      this.userId=userId;
    }
+
 
    public String getToken() {
       return token;
@@ -22,20 +23,22 @@ public class LoginResponse {
    public void setToken(String token) {
       this.token = token;
    }
-
-   public String getRoles() {
+   public String getRoles()
+   {
       return this.roles;
    }
 
-   public void setRole(String roles) {
+   public void setRole(String roles)
+   {
       this.roles = roles;
    }
-
-   public void setUserId(Integer userId) {
-      this.userId = userId;
+   public void setUserId(Integer userId)
+   {
+      this.userId=userId;
    }
 
-   public long getUserId() {
+   public long getUserId()
+   {
       return this.userId;
    }
 }

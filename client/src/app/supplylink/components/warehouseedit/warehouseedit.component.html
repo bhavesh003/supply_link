@@ -5,7 +5,7 @@
         <input type="text" id="supplier" formControlName="supplier" class="form-control" />
     </div>
     <div class="form-group">
-        <label for="warehouseName">Warehouse Name:</label>
+        <label for="warehouseName">Warehouse name:</label>
         <input type="text" id="warehouseName" formControlName="warehouseName" class="form-control" />
         <div *ngIf="warehouseForm.get('warehouseName')?.invalid && warehouseForm.get('warehouseName')?.touched"
             class="error">
@@ -26,7 +26,7 @@
         </div>
     </div>
     <button type="submit" class="btn-submit">Update Warehouse</button>
-    <a routerLink="/supplylink" class="task-list" class="task-list">Dashboard</a>
+    <a routerlink="/supplylink" class="task-list" class="task-list">Dashboard</a>
     <ng-container>
         <div *ngIf="successMessage" class="success">
             <p>{{ successMessage }}</p>

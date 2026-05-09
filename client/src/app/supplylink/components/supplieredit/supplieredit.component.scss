@@ -1,4 +1,3 @@
-/* General form container */
 .user-form {
     max-width: 450px;
     margin: 20px auto;
@@ -7,10 +6,10 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-family: Arial, sans-serif;
+    font-family: arial, sans-serif;
   }
   
-  /* Form group styling */
+  /* form group styling */
   .form-group {
     margin-bottom: 20px;
   }
@@ -22,7 +21,7 @@
     color: #333;
   }
   
-  /* Input fields and select */
+  /* input fields and select */
   input[type="text"],
   input[type="email"],
   input[type="password"],
@@ -44,7 +43,7 @@
     outline: none;
   }
   
-  /* Submit button styling */
+  /* submit button styling */
   button.btn-submit {
     width: 100%;
     padding: 12px 0;

@@ -8,7 +8,11 @@ import org.springframework.stereotype.Repository;
 import com.edutech.progressive.entity.Supplier;
 
 @Repository
-public interface SupplierRepository extends JpaRepository<Supplier, Integer> {
+public interface SupplierRepository extends JpaRepository<Supplier,Integer> {
+
+    // @Query("Select from Supplier s where s.supplierId =:supplierId")
+ 
+    
 
     void deleteBySupplierId(@Param("supplierId") int supplierId);
 

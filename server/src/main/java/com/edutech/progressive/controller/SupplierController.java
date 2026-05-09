@@ -71,8 +71,12 @@ public class SupplierController {
 
     @DeleteMapping("/{supplierId}")
     public ResponseEntity<Void> deleteSupplier(@PathVariable int supplierId) {
+        try {
             supplierServiceImplJpa.deleteSupplier(supplierId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (SQLException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/fromArrayList")

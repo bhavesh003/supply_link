@@ -8,64 +8,66 @@ import com.edutech.progressive.entity.Product;
 import com.edutech.progressive.service.ProductService;
 
 public class ProductServiceImplJdbc implements ProductService {
-    private ProductDAO productDAO;
+   private ProductDAO productDAO;
 
+ 
+ 
+ 
     public ProductServiceImplJdbc(ProductDAO productDAO) {
-        this.productDAO = productDAO;
-    }
-
+    this.productDAO = productDAO;
+}
+ 
     @Override
-    public List<Product> getAllProducts() throws SQLException {
-        try {
-            return productDAO.getAllProducts();
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-
+    public List<Product> getAllProducts()throws SQLException{
+        try{
+       return productDAO.getAllProducts();
+        }catch(SQLException e){
+           throw e;
+        }finally{
+ 
         }
     }
-
+ 
     @Override
-    public Product getProductById(int productId) throws SQLException {
-        try {
-            return productDAO.getProductById(productId);
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-
-        }
+    public Product getProductById(int productId)throws SQLException {
+        try{
+              return productDAO.getProductById(productId);
+    }catch(SQLException e){
+        throw e;
+    }finally{
+ 
     }
-
+}
+ 
     @Override
-    public int addProduct(Product product) throws SQLException {
-        try {
-            return productDAO.addProduct(product);
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-
-        }
+    public int addProduct(Product product)throws SQLException{
+        try{
+         return productDAO.addProduct(product);
+    }catch(SQLException e){
+        throw e;
+    }finally{
+ 
     }
-
+}
+ 
     @Override
-    public void updateProduct(Product product) throws SQLException {
-        try {
-            productDAO.updateProduct(product);
-        } catch (SQLException e) {
+    public void updateProduct(Product product)throws SQLException{
+        try{
+     productDAO.updateProduct(product);
+        }catch(SQLException e){
             throw e;
-        } finally {
-
+        }finally{
+ 
         }
-    }
-
+}
     @Override
-    public void deleteProduct(int productId) throws SQLException {
-        try {
-            productDAO.deleteProduct(productId);
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-        }
+    public void deleteProduct(int productId)throws SQLException{
+      try{
+        productDAO.deleteProduct(productId);
+      }catch(SQLException e){
+        throw e;
+      }finally{
+      }
     }
-
+ 
 }

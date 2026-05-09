@@ -5,7 +5,7 @@ import { of } from 'rxjs';
 import { SupplyLinkService } from '../../services/supplylink.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-
+ 
 @Component({
     selector: 'app-supplieredit',
     templateUrl: './supplieredit.component.html',
@@ -17,14 +17,14 @@ export class SupplierEditComponent implements OnInit {
     supplierForm!: FormGroup;
     supplier: Supplier | null = null;
     supplierId!: number;
-
+ 
     constructor(
         private formBuilder: FormBuilder,
         private supplyLinkService: SupplyLinkService,
         private route: ActivatedRoute,
         private router: Router
     ) { }
-
+ 
     ngOnInit(): void {
         this.supplierForm = this.formBuilder.group({
             supplierName: ["", [Validators.required]],
@@ -40,7 +40,7 @@ export class SupplierEditComponent implements OnInit {
             this.loadSupplierDetails();
         });
     }
-
+ 
     loadSupplierDetails(): void {
         this.supplyLinkService.getSupplierById(this.supplierId).subscribe({
             next: (supplier) => {
@@ -50,6 +50,7 @@ export class SupplierEditComponent implements OnInit {
                     email: supplier.email,
                     phone: supplier.phone,
                     address: supplier.address,
+                    password:supplier.password,
                     username: supplier.username,
                     role: supplier.role
                 });
@@ -60,7 +61,7 @@ export class SupplierEditComponent implements OnInit {
             }
         })
     }
-
+ 
     private noSpecialCharacters(control: any): { [key: string]: boolean } | null {
         const SPECIAL_CHARACTERS_REGEX = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/;
         if (SPECIAL_CHARACTERS_REGEX.test(control.value)) {
@@ -68,7 +69,7 @@ export class SupplierEditComponent implements OnInit {
         }
         return null;
     }
-
+ 
     onSubmit(): void {
         if (this.supplierForm.valid) {
             const updatedSupplier: Supplier = {
@@ -103,5 +104,5 @@ export class SupplierEditComponent implements OnInit {
             this.successMessage = null;
         }
     }
-
+ 
 }

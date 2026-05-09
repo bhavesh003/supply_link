@@ -1,77 +1,99 @@
 package com.edutech.progressive.service.impl;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.edutech.progressive.entity.Supplier;
 import com.edutech.progressive.exception.SupplierAlreadyExistsException;
 import com.edutech.progressive.exception.SupplierDoesNotExistException;
+import com.edutech.progressive.repository.ProductRepository;
+import com.edutech.progressive.repository.ShipmentRepository;
 import com.edutech.progressive.repository.SupplierRepository;
+import com.edutech.progressive.repository.WarehouseRepository;
 import com.edutech.progressive.service.SupplierService;
+
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class SupplierServiceImplJpa implements SupplierService {
 
-    private SupplierRepository supplierRepository;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    WarehouseRepository warehouseRepository;
+
+    @Autowired
+    ProductRepository productRepository;
+
+    @Autowired
+    ShipmentRepository shipmentRepository;
+
+    private final SupplierRepository supplierRepository;
 
     @Autowired
     public SupplierServiceImplJpa(SupplierRepository supplierRepository) {
         this.supplierRepository = supplierRepository;
     }
 
-    public List<Supplier> getAllSuppliers() {
+    @Override
+    public List<Supplier> getAllSuppliers() throws SQLException {
         return supplierRepository.findAll();
     }
 
-    public int addSupplier(Supplier supplier) {
-        if (supplierRepository.findByUsername(supplier.getUsername()) != null) {
-            throw new SupplierAlreadyExistsException("Supplier already exists");
+    @Override
+    public int addSupplier(Supplier supplier) throws SupplierAlreadyExistsException {
+        Supplier oldUser = supplierRepository.findByUsername(supplier.getUsername());
+        if (oldUser != null) {
+            throw new SupplierAlreadyExistsException("User name Is Unavailable: " + supplier.getUsername());
         }
-        if (supplierRepository.findByEmail(supplier.getEmail()) != null) {
-            throw new SupplierAlreadyExistsException("Supplier already exists");
+        Supplier existingEmail = supplierRepository.findByEmail(supplier.getEmail());
+        if (existingEmail != null) {
+            throw new SupplierAlreadyExistsException("User with the given email address already exists: " + supplier.getEmail());
         }
-        Supplier savedSupplier = supplierRepository.save(supplier);
-        return savedSupplier.getSupplierId();
+        supplier.setPassword(passwordEncoder.encode(supplier.getPassword()));
+        return supplierRepository.save(supplier).getSupplierId();
     }
 
-    public List<Supplier> getAllSuppliersSortedByName() {
-        List<Supplier> result = supplierRepository.findAll();
-        Collections.sort(result);
-        return result;
+    @Override
+    public List<Supplier> getAllSuppliersSortedByName() throws SQLException {
+        List<Supplier> sortedSuppliers = supplierRepository.findAll();
+        Collections.sort(sortedSuppliers);
+        return sortedSuppliers;
     }
 
-    public void updateSupplier(int supplierId, Supplier supplier) {
-        if (supplierRepository.findByUsername(supplier.getUsername()) != null) {
-            throw new SupplierAlreadyExistsException("Supplier Already exists");
-        }
-        Supplier updatedSupplier = supplierRepository.findBySupplierId(supplierId);
-        if (updatedSupplier != null) {
-
-            updatedSupplier.setSupplierName(supplier.getSupplierName());
-            updatedSupplier.setEmail(supplier.getEmail());
-            updatedSupplier.setPhone(supplier.getPhone());
-            updatedSupplier.setAddress(supplier.getAddress());
-            updatedSupplier.setUsername(supplier.getUsername());
-            updatedSupplier.setPassword(supplier.getPassword());
-            updatedSupplier.setRole(supplier.getRole());
+    @Override
+    public void updateSupplier(Supplier supplier) throws SupplierAlreadyExistsException {
+        if (!supplier.getRole().isBlank()) {
+            Supplier oldUser = supplierRepository.findByUsername(supplier.getUsername());
+           if (oldUser != null && oldUser.getSupplierId() != supplier.getSupplierId()) {
+                throw new SupplierAlreadyExistsException("User name Is Unavailable: " + supplier.getUsername());
+            }
+            if (!oldUser.getPassword().equals(supplier.getPassword())) {
+                supplier.setPassword(passwordEncoder.encode(supplier.getPassword()));
+            }
             supplierRepository.save(supplier);
         }
-
     }
 
-    public void deleteSupplier(int supplierId) {
-        supplierRepository.deleteById(supplierId);
+    @Override
+    @Transactional
+    public void deleteSupplier(int supplierId) throws SQLException {
+        shipmentRepository.deleteBySupplierId(supplierId);
+        productRepository.deleteBySupplierId(supplierId);
+        warehouseRepository.deleteBySupplierId(supplierId);
+        supplierRepository.deleteBySupplierId(supplierId);
     }
 
-    public Supplier getSupplierById(int supplierId) {
-        if (!supplierRepository.existsById(supplierId)) {
-            throw new SupplierDoesNotExistException("Supplier does not exist");
+    @Override
+    public Supplier getSupplierById(int supplierId) throws SupplierDoesNotExistException {
+        Supplier supplier = supplierRepository.findBySupplierId(supplierId);
+        if (supplier != null) {
+            return supplierRepository.findBySupplierId(supplierId);
         }
-        return supplierRepository.findBySupplierId(supplierId);
+        throw new SupplierDoesNotExistException("Supplier with the given supplierId does not exists");
     }
-
 }

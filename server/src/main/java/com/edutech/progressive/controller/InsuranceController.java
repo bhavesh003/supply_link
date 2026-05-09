@@ -17,13 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.SQLException;
 import java.util.List;
-
 @RestController
 @RequestMapping("/insurance")
 public class InsuranceController {
     @Autowired
     InsuranceServiceImpl insuranceService;
-
+ 
     @GetMapping
     public ResponseEntity<List<Insurance>> getAllInsurances() {
         try {
@@ -32,9 +31,9 @@ public class InsuranceController {
         } catch (SQLException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
+ 
     }
-
+ 
     @GetMapping("/{insuranceId}")
     public ResponseEntity<Insurance> getInsuranceById(@PathVariable int insuranceId) {
         try {
@@ -48,7 +47,7 @@ public class InsuranceController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+ 
     @PostMapping
     public ResponseEntity<Integer> createInsurance(@RequestBody Insurance insurance) {
         try {
@@ -58,7 +57,7 @@ public class InsuranceController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+ 
     @PutMapping("/{insuranceId}")
     public ResponseEntity<Void> updateInsurance(@PathVariable int insuranceId, @RequestBody Insurance insurance) {
         try {
@@ -69,7 +68,7 @@ public class InsuranceController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+ 
     @DeleteMapping("/{insuranceId}")
     public ResponseEntity<Void> deleteInsurance(@PathVariable int insuranceId) {
         try {
