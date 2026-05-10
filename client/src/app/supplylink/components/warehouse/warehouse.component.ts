@@ -28,7 +28,7 @@ export class WarehouseComponent implements OnInit {
     this.warehouseForm = this.fb.group({
       supplier: [null, [Validators.required]],
       warehouseName: ["", [Validators.required]],
-      location: [""],
+      location: ["",[Validators.required, Validators.minLength(4)]],
       capacity: ["", [Validators.required, Validators.min(0)]],
     });
   }

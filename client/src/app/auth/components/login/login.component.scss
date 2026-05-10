@@ -1,64 +1,152 @@
 .login-form {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #fff;
-  }
-  
-  .login-form label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: bold;
-  }
-  
-  .login-form input[type="text"],
-  .login-form input[type="password"],
-  .login-form select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-  }
-  
-  .login-form .error {
-    color: red;
-    margin-top: 10px;
-    text-align: center;
-  }
-  
-  .login-form button[type="submit"] {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-top: 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #4caf50;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  .login-form button[type="submit"]:hover {
-    background-color: #45a049;
-  }
-  
-  .login-form .error-message {
-    color: red;
-    margin-top: 10px;
-  }
-  
-  a.task-list {
-    display: block;
-    margin-top: 20px;
-    text-align: center;
-    text-decoration: none;
-    color: #007bff;
-  }
-  
-  a.task-list:hover {
-    text-decoration: underline;
-  }
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 30px 34px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(99, 102, 241, 0.25);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Row clearfix */
+.row::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Column system */
+[class*="col-"] {
+  float: left;
+  padding: 12px;
+}
+
+.col-1 { width: 8.33%; }
+.col-2 { width: 16.67%; }
+.col-3 { width: 25%; }
+.col-4 { width: 33.33%; }
+.col-5 { width: 41.67%; }
+.col-6 { width: 50%; }
+.col-7 { width: 58.33%; }
+.col-8 { width: 66.67%; }
+.col-9 { width: 75%; }
+.col-10 { width: 83.33%; }
+.col-11 { width: 91.67%; }
+.col-12 { width: 100%; }
+
+/* Card */
+.card {
+  background-color: #ffffff;
+  margin: 14px 0;
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 18px 40px rgba(99, 102, 241, 0.25);
+}
+
+.card-body {
+  padding: 22px 24px;
+}
+
+.card-body {
+  padding: 22px 24px;
+}
+
+/* Label */
+.login-form label {
+  display: block;
+  margin-bottom: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Inputs */
+.login-form input[type="text"],
+.login-form input[type="password"] {
+  width: 100%;
+  padding: 13px 15px;
+  margin-top: 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  background-color: #f9fafb;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+  background-color: #ffffff;
+}
+
+/* Error text */
+.error {
+  color: #dc2626;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+/* Submit button */
+.login-form button[type="submit"] {
+  width: 100%;
+  padding: 13px;
+  margin-top: 26px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #22d3ee);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-form button[type="submit"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(99, 102, 241, 0.45);
+}
+
+/* Signup link */
+a.task-list {
+  display: block;
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+  text-decoration: none;
+  color: #6366f1;
+  font-weight: 500;
+}
+
+a.task-list:hover {
+  text-decoration: underline;
+}
+
+/* Server error message */
+// .login-form .error-message {
+//   margin-top: 16px;
+//   text-align: center;
+//   font-size: 14px;
+//   color: #dc2626;
+// }
+
+.error,
+.success {
+  margin-top: 18px;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-align: center;
+  font-size: 14px;
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}

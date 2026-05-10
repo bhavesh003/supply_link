@@ -40,7 +40,6 @@
 /home/coder/app/server/src/main/java/com/edutech/progressive/service/impl/SupplierServiceImplJdbc.java
 /home/coder/app/server/src/main/java/com/edutech/progressive/service/ShipmentService.java
 /home/coder/app/server/src/main/java/com/edutech/progressive/service/SupplierService.java
-/home/coder/app/server/src/main/java/com/edutech/progressive/entity/GenerationType.java
 /home/coder/app/server/src/main/java/com/edutech/progressive/controller/ProductController.java
 /home/coder/app/server/src/main/java/com/edutech/progressive/exception/SupplierDoesNotExistException.java
 /home/coder/app/server/src/main/java/com/edutech/progressive/service/impl/WarehouseServiceImplJpa.java

@@ -25,8 +25,8 @@ export class SupplierComponent implements OnInit {
     this.supplierForm = this.formBuilder.group({
       supplierName: ["", [Validators.required]],
       email: ["", [Validators.required, Validators.email]],
-      phone: [""],
-      address: [""],
+      phone: ["", [Validators.required, Validators.minLength(10), Validators.maxLength(10)]],
+      address: ["", [Validators.required,Validators.minLength(4)]],
       username: ["", [Validators.required, this.noSpecialCharacters]],
       password: ["", [Validators.required, Validators.minLength(8)]],
       role: ["", [Validators.required]]

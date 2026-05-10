@@ -1,41 +1,109 @@
 <app-navbar></app-navbar>
-<form (ngSubmit)="onSubmit()" [formGroup]="productForm" class="user-form">
+
+<form class="user-form" [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <!-- Warehouse -->
     <div class="form-group">
-        <label for="warehouse">Warehouse :</label>
-        <select formControlName="warehouse">
+        <label for="warehouse">Warehouse:</label>
+        <select id="warehouse" formControlName="warehouse">
             <option value="">Select a Warehouse</option>
             <option *ngFor="let warehouse of warehouses | async" [ngValue]="warehouse">
                 {{ warehouse.warehouseName }}
             </option>
         </select>
+
+        <small class="error" *ngIf="
+        (productForm.get('warehouse')?.touched || isFormSubmitted) &&
+        productForm.get('warehouse')?.errors?.['required']
+      ">
+            Warehouse is required
+        </small>
     </div>
+
+    <!-- Product Name -->
     <div class="form-group">
         <label for="productName">Product Name:</label>
-        <input type="text" id="productName" formControlName="productName" class="form-control" />
+        <input type="text" id="productName" formControlName="productName" />
+
+        <small class="error" *ngIf="
+        (productForm.get('productName')?.touched || isFormSubmitted) &&
+        productForm.get('productName')?.errors?.['required']
+      ">
+            Product name is required
+        </small>
     </div>
+
+    <!-- Product Description -->
     <div class="form-group">
         <label for="productDescription">Product Description:</label>
-        <input type="text" id="productDescription" formControlName="productDescription" class="form-control" />
+        <input type="text" id="productDescription" formControlName="productDescription" />
+
+        <small class="error" *ngIf="
+        (productForm.get('productDescription')?.touched || isFormSubmitted) &&
+        productForm.get('productDescription')?.errors?.['required']
+      ">
+            Product description is required
+        </small>
     </div>
+
+    <!-- Quantity -->
     <div class="form-group">
-        <label for="quantity">Quantity :</label>
-        <input type="number" id="quantity" formControlName="quantity" class="form-control" />
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" formControlName="quantity" />
+
+        <small class="error" *ngIf="
+        (productForm.get('quantity')?.touched || isFormSubmitted) &&
+        productForm.get('quantity')?.errors?.['required']
+      ">
+            Quantity is required
+        </small>
+
+        <small class="error" *ngIf="
+        (productForm.get('quantity')?.touched || isFormSubmitted) &&
+        productForm.get('quantity')?.errors?.['min']
+      ">
+            Quantity cannot be negative
+        </small>
+        <div *ngIf="errorMessage " class="error">
+            {{ errorMessage }}
+        </div>
     </div>
+
+    <!-- Price -->
     <div class="form-group">
-        <label for="price">Price :</label>
-        <input type="number" id="price" formControlName="price" class="form-control" />
+        <label for="price">Price:</label>
+        <input type="number" id="price" formControlName="price" />
+
+        <small class="error" *ngIf="
+        (productForm.get('price')?.touched || isFormSubmitted) &&
+        productForm.get('price')?.errors?.['required']
+      ">
+            Price is required
+        </small>
+
+        <small class="error" *ngIf="
+        (productForm.get('price')?.touched || isFormSubmitted) &&
+        productForm.get('price')?.errors?.['min']
+      ">
+            Price must be greater than 0
+        </small>
     </div>
 
-    <button type="submit" class="btn-submit">Create Product</button>
+    <!-- Submit -->
+    <button type="submit" class="btn-submit">
+        Create Product
+    </button>
 
-    <ng-container>
-        <div *ngIf="productError | async as error" class="error">
-            {{ error }}
-        </div>
-        <div *ngIf="productSuccess | async as msg" class="success">
-            {{ msg }}
-        </div>
-    </ng-container>
+    <!-- API Messages -->
+    <div *ngIf="productError | async as error" class="error">
+        {{ error }}
+    </div>
 
-    <a routerLink="/supplylink" class="task-list" class="task-list">Dashboard</a>
+    <div *ngIf="productSuccess | async as msg" class="success">
+        {{ msg }}
+    </div>
+
+    <!-- Back -->
+    <a routerLink="/supplylink" class="task-list">
+        Dashboard
+    </a>
 </form>

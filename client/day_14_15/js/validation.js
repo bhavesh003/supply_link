@@ -49,6 +49,7 @@ function register() {
         return;
     }
 
+    
 
     var usernameRegex = /^[a-zA-Z0-9]+$/;
     if (!usernameRegex.test(username)) {

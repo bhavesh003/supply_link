@@ -27,7 +27,6 @@ com/edutech/progressive/service/impl/ShipmentServiceImpl.class
 com/edutech/progressive/entity/Supplier.class
 com/edutech/progressive/repository/InsuranceRepository.class
 com/edutech/progressive/entity/Shipment.class
-com/edutech/progressive/entity/GenerationType.class
 com/edutech/progressive/repository/ProductRepository.class
 com/edutech/progressive/controller/ShipmentController.class
 com/edutech/progressive/dao/WarehouseDAO.class

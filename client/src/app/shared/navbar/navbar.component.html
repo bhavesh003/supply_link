@@ -1,17 +1,38 @@
-<nav class="navbar">
-    <ul class="navbar-list">
-        <li><a routerLink="/supplylink" class="nav-link app-name">SupplyLink</a></li>
+<nav class="navbar bg-dark px-4 shadow-lg">
+    <div class="container-fluid d-flex align-items-center">
 
-        <li *ngIf="role !== 'USER'">
-            <a routerLink="/supplylink/supplier" class="nav-link">Add New Supplier</a>
-        </li>
-        <li *ngIf="role !== 'USER'">
-            <a routerLink="/supplylink/warehouse" class="nav-link">Add New Warehouse</a>
-        </li>
-        <li *ngIf="role === 'USER'">
-            <a routerLink="/supplylink/product" class="nav-link">Add New Product</a>
-        </li>
-    </ul>
+        <!-- App Name -->
+        <a routerLink="/supplylink" class="navbar-brand text-white fw-semibold fs-4 cursor-pointer nav-link nav-link-custom">
+            SupplyLink
+        </a>
 
-    <app-logout></app-logout>
+        <!-- Navigation Links -->
+        <ul class="nav gap-3 ms-4">
+
+            <li class="nav-item" *ngIf="role !== 'USER'">
+                <a routerLink="/supplylink/supplier" class="nav-link nav-link-custom">
+                    Add Supplier
+                </a>
+            </li>
+
+            <li class="nav-item" *ngIf="role !== 'USER'">
+                <a routerLink="/supplylink/warehouse" class="nav-link nav-link-custom">
+                    Add Warehouse
+                </a>
+            </li>
+
+            <li class="nav-item" *ngIf="role === 'USER'">
+                <a routerLink="/supplylink/product" class="nav-link nav-link-custom">
+                    Add Product
+                </a>
+            </li>
+
+        </ul>
+
+        <!-- Logout -->
+        <div class="ms-auto">
+            <app-logout></app-logout>
+        </div>
+
+    </div>
 </nav>

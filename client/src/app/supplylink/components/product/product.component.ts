@@ -17,6 +17,7 @@ export class ProductComponent implements OnInit {
     productSuccess: Observable<string> = of('');
     isFormSubmitted: boolean = false;
     userId!: number;
+    errorMessage: string = ''
 
     constructor(
         private formBuilder: FormBuilder,
@@ -33,6 +34,7 @@ export class ProductComponent implements OnInit {
             price: [null, [Validators.required, Validators.min(1)]],
         });
         this.warehouses = this.supplyLinkService.getWarehousesBySupplier(this.userId);
+
     }
 
     onSubmit() {
@@ -48,8 +50,13 @@ export class ProductComponent implements OnInit {
                 this.productSuccess = of("Product created successfully");
                 this.productForm.reset();
                 this.isFormSubmitted = false;
+                this.errorMessage = ''
             },
-            error: (error) => this.productError = of("Unable to create product")
+            error: (err) => {
+                this.errorMessage = err.error
+
+                // this.errorMessage = err?.error?.message || 'Insufficient warehouse capacity'
+            }
         });
     }
 }
