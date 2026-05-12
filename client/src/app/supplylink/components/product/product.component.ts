@@ -53,9 +53,8 @@ export class ProductComponent implements OnInit {
                 this.errorMessage = ''
             },
             error: (err) => {
-                this.errorMessage = err.error
-
-                // this.errorMessage = err?.error?.message || 'Insufficient warehouse capacity'
+                // this.errorMessage = err.error
+                this.errorMessage = err?.error?.message || 'Insufficient warehouse capacity'
             }
         });
     }

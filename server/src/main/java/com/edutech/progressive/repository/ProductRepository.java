@@ -16,7 +16,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer>{
     Product findByProductId(@Param("productId") int productId);
  
     List<Product> findAllByWarehouse_WarehouseId(@Param("warehouseId") int warehouseId);
-    // List<Product> findAllByWarehouse_WarehouseId(@Param("warehouseId") int warehouseId);
  
     @Modifying
     @Transactional

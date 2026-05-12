@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AuthService } from "../../services/auth.service";
 
 import { HttpErrorResponse } from "@angular/common/http";
- 
+
 @Component({
 
     selector: "app-user",
@@ -23,7 +23,7 @@ export class UserComponent implements OnInit {
     successMessage: string | null = null;
 
     errorMessage: string | null = null;
- 
+
     constructor(
 
         private formBuilder: FormBuilder,
@@ -31,7 +31,7 @@ export class UserComponent implements OnInit {
         private authService: AuthService
 
     ) { }
- 
+
     ngOnInit(): void {
 
         this.userForm = this.formBuilder.group({
@@ -49,7 +49,7 @@ export class UserComponent implements OnInit {
         });
 
     }
- 
+
     private noSpecialCharacters(control: any): { [key: string]: boolean } | null {
 
         const SPECIAL_CHARACTERS_REGEX = /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/;
@@ -63,42 +63,26 @@ export class UserComponent implements OnInit {
         return null;
 
     }
- 
+
     onSubmit(): void {
-
         if (this.userForm.valid) {
-
             this.authService.createUser(this.userForm.value).subscribe({
-
-                next: (response) => {
-
+                next: () => {
                     this.successMessage = "User created successfully";
-
+                    this.errorMessage = null;
                     this.userForm.reset();
-
-                    this.errorMessage = "";
-
                 },
-
-                error: (error) => {
-
-                    console.log(error);
-
-                    this.errorMessage = error.error ?? "Please fill the form correctly";
-
+                error: (error: HttpErrorResponse) => {
+                    if (error.status === 409) {
+                        this.errorMessage = "User already exists.";
+                    } else {
+                        this.errorMessage = "User already exists.";
+                    }
                 }
-
             });
-
-        }
-
-        else {
-
+        } else {
             this.errorMessage = "Please fill the form correctly";
-
         }
-
     }
 
 }
- 
